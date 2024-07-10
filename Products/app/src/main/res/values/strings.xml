@@ -1,0 +1,15 @@
+<resources>
+    <string name="app_name">Products</string>
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="list_products">List Products</string>
+    <string name="intent">Intent</string>
+    <string name="profile">Profile</string>
+    <string name="galery">Galery</string>
+    <string name="camera">Camera</string>
+    <string name="username">Fakhri Zain</string>
+    <string name="email">fakhrizain9@gmail.com</string>
+    <string name="_087884984112">087884984112</string>
+    <string name="_01_jun_2006">01 Jun 2006</string>
+    <string name="jakarta">Jakarta</string>
+</resources>
