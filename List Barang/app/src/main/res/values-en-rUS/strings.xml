@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Item List</string>
+    <string name="example_nama_barang">Item Name</string>
+    <string name="example_kategori">Electronics</string>
+    <string name="example_harga">Rp 20.000</string>
+    <string name="todo">TODO</string>
+    <string name="example_deskripsi">Description</string>
+    <string name="example_stock">30</string>
+    <string name="harga">Price : %s</string>
+    <string name="kategori">Category: %s</string>
+    <string name="stock">Stock : %s</string>
+    <string name="deskripsi">Description : %s</string>
+
+    <string-array name="product_names">
+        <item>Acer Aspire 5 Laptop</item>
+        <item>Samsung Galaxy A52 Smartphone</item>
+        <item>Sony WH-1000XM4 Headphones</item>
+        <item>Apple Watch Series 6 Smartwatch</item>
+        <item>Canon EOS M50 Camera</item>
+        <item>Samsung 55 Inch QLED TV</item>
+        <item>Philips HR2221/00 Blender</item>
+        <item>Panasonic NI-E510T Steam Iron</item>
+        <item>LG MS4295CIS Microwave</item>
+        <item>Samsung WW75J54E0IW Washing Machine</item>
+        <item>Sharp SJ-X185MG Refrigerator</item>
+        <item>Daikin FTNE15JEV14 Air Conditioner</item>
+        <item>Dyson V11 Vacuum Cleaner</item>
+        <item>Rinnai RI-522C Gas Stove</item>
+        <item>Philips HD3132 Rice Cooker</item>
+    </string-array>
+
+    <string-array name="product_descriptions">
+        <item>Laptop with Intel Core i5 processor, 8GB RAM, 512GB SSD.</item>
+        <item>Smartphone with 6.5-inch display, 6GB RAM, 128GB internal storage.</item>
+        <item>Wireless headphones with active noise cancellation.</item>
+        <item>Smartwatch with blood oxygen sensor and other health features.</item>
+        <item>Mirrorless camera with APS-C sensor, 24.1 MP, 4K video.</item>
+        <item>Smart TV with 4K QLED display, HDR10+.</item>
+        <item>Blender with 700W motor, 5 speeds, stainless steel blades.</item>
+        <item>Steam iron with titanium coating, automatic temperature control.</item>
+        <item>Microwave with 42-liter capacity, inverter technology.</item>
+        <item>Front load washing machine with 7.5 kg capacity, EcoBubble technology.</item>
+        <item>1-door refrigerator with 180-liter capacity, energy-saving.</item>
+        <item>½ PK split AC with inverter technology, energy efficient.</item>
+        <item>Wireless vacuum cleaner with high suction power, HEPA filter.</item>
+        <item>2-burner gas stove with stainless steel body, automatic ignition.</item>
+        <item>Rice cooker with 2-liter capacity, 8 automatic menus.</item>
+    </string-array>
+
+    <string-array name="product_categories">
+        <item>Electronics</item>
+        <item>Electronics</item>
+        <item>Electronics</item>
+        <item>Electronics</item>
+        <item>Electronics</item>
+        <item>Electronics</item>
+        <item>Home Appliances</item>
+        <item>Home Appliances</item>
+        <item>Home Appliances</item>
+        <item>Home Appliances</item>
+        <item>Home Appliances</item>
+        <item>Home Appliances</item>
+        <item>Home Appliances</item>
+        <item>Home Appliances</item>
+        <item>Home Appliances</item>
+    </string-array>
+
+    <integer-array name="product_prices">
+        <item>519</item>
+        <item>257</item>
+        <item>232</item>
+        <item>458</item>
+        <item>562</item>
+        <item>734</item>
+        <item>52</item>
+        <item>40</item>
+        <item>147</item>
+        <item>275</item>
+        <item>122</item>
+        <item>196</item>
+        <item>581</item>
+        <item>24</item>
+        <item>37</item>
+    </integer-array>
+
+</resources>

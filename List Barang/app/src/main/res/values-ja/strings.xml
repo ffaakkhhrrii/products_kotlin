@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">アイテムリスト</string>
+    <string name="example_nama_barang">商品名</string>
+    <string name="example_kategori">電子製品</string>
+    <string name="example_harga">Rp 20.000</string>
+    <string name="todo">TODO</string>
+    <string name="example_deskripsi">説明</string>
+    <string name="example_stock">30</string>
+    <string name="harga">価格 : %s</string>
+    <string name="kategori">カテゴリ : %s</string>
+    <string name="stock">在庫 : %s</string>
+    <string name="deskripsi">説明 : %s</string>
+
+    <string-array name="product_names">
+        <item>Acer Aspire 5 ノートパソコン</item>
+        <item>Samsung Galaxy A52 スマートフォン</item>
+        <item>Sony WH-1000XM4 ヘッドフォン</item>
+        <item>Apple Watch Series 6 スマートウォッチ</item>
+        <item>Canon EOS M50 カメラ</item>
+        <item>Samsung 55インチ QLED テレビ</item>
+        <item>Philips HR2221/00 ブレンダー</item>
+        <item>Panasonic NI-E510T スチームアイロン</item>
+        <item>LG MS4295CIS 電子レンジ</item>
+        <item>Samsung WW75J54E0IW 洗濯機</item>
+        <item>Sharp SJ-X185MG 冷蔵庫</item>
+        <item>Daikin FTNE15JEV14 エアコン</item>
+        <item>Dyson V11 掃除機</item>
+        <item>Rinnai RI-522C ガスストーブ</item>
+        <item>Philips HD3132 炊飯器</item>
+    </string-array>
+
+    <string-array name="product_descriptions">
+        <item>インテル Core i5 プロセッサー、8GB RAM、512GB SSD 搭載のノートパソコン。</item>
+        <item>6.5インチディスプレイ、6GB RAM、128GB 内部ストレージを搭載したスマートフォン。</item>
+        <item>アクティブノイズキャンセリング対応のワイヤレスヘッドフォン。</item>
+        <item>血中酸素センサーやその他の健康機能を搭載したスマートウォッチ。</item>
+        <item>APS-C センサー、24.1 MP、4K ビデオ撮影対応のミラーレスカメラ。</item>
+        <item>4K QLED ディスプレイ、HDR10+ 対応のスマートテレビ。</item>
+        <item>700W モーター、5段階スピード調整、ステンレススチールブレードを備えたブレンダー。</item>
+        <item>チタンコーティング、自動温度制御機能付きのスチームアイロン。</item>
+        <item>42リットル容量、インバーター技術搭載の電子レンジ。</item>
+        <item>7.5 kg 定格容量、EcoBubble 技術搭載のフロントロード洗濯機。</item>
+        <item>180リットル容量の1ドア冷蔵庫、省エネ設計。</item>
+        <item>インバーター技術搭載の½ PK スプリットエアコン、節電対応。</item>
+        <item>高吸引力、HEPA フィルター搭載のワイヤレス掃除機。</item>
+        <item>ステンレススチール製ボディ、自動点火機能付きの2口ガスストーブ。</item>
+        <item>2リットル容量、8つの自動メニュー搭載の炊飯器。</item>
+    </string-array>
+
+    <string-array name="product_categories">
+        <item>電子製品</item>
+        <item>電子製品</item>
+        <item>電子製品</item>
+        <item>電子製品</item>
+        <item>電子製品</item>
+        <item>電子製品</item>
+        <item>家電製品</item>
+        <item>家電製品</item>
+        <item>家電製品</item>
+        <item>家電製品</item>
+        <item>家電製品</item>
+        <item>家電製品</item>
+        <item>家電製品</item>
+        <item>家電製品</item>
+        <item>家電製品</item>
+    </string-array>
+
+    <integer-array name="product_prices">
+        <item>83905</item>
+        <item>41514</item>
+        <item>37512</item>
+        <item>74002</item>
+        <item>90866</item>
+        <item>118448</item>
+        <item>8391</item>
+        <item>6421</item>
+        <item>23726</item>
+        <item>44412</item>
+        <item>19742</item>
+        <item>31602</item>
+        <item>93924</item>
+        <item>3950</item>
+        <item>5930</item>
+    </integer-array>
+</resources>

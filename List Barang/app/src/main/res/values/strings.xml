@@ -1,0 +1,139 @@
+<resources>
+    <string name="app_name">List Barang</string>
+    <string name="example_nama_barang">Nama Barang</string>
+    <string name="example_kategori">Elektronik</string>
+    <string name="example_harga">Rp 20.000</string>
+    <string name="todo">TODO</string>
+    <string name="example_deskripsi">Deskripsi</string>
+    <string name="example_stock">30</string>
+    <string name="harga">Harga : %s</string>
+    <string name="kategori">Kategori : %s</string>
+    <string name="stock">Stock : %s</string>
+    <string name="deskripsi">Deskripsi : %s</string>
+
+    <string-array name="product_ids">
+        <item>P001</item>
+        <item>P002</item>
+        <item>P003</item>
+        <item>P004</item>
+        <item>P005</item>
+        <item>P006</item>
+        <item>P007</item>
+        <item>P008</item>
+        <item>P009</item>
+        <item>P010</item>
+        <item>P011</item>
+        <item>P012</item>
+        <item>P013</item>
+        <item>P014</item>
+        <item>P015</item>
+    </string-array>
+
+    <string-array name="product_names">
+        <item>Laptop Acer Aspire 5</item>
+        <item>Smartphone Samsung Galaxy A52</item>
+        <item>Headphone Sony WH-1000XM4</item>
+        <item>Smartwatch Apple Watch Series 6</item>
+        <item>Kamera Canon EOS M50</item>
+        <item>TV Samsung 55 Inch QLED</item>
+        <item>Blender Philips HR2221/00</item>
+        <item>Setrika Uap Panasonic NI-E510T</item>
+        <item>Microwave LG MS4295CIS</item>
+        <item>Mesin Cuci Samsung WW75J54E0IW</item>
+        <item>Kulkas Sharp SJ-X185MG</item>
+        <item>AC Daikin FTNE15JEV14</item>
+        <item>Vacuum Cleaner Dyson V11</item>
+        <item>Kompor Gas Rinnai RI-522C</item>
+        <item>Rice Cooker Philips HD3132</item>
+    </string-array>
+
+    <string-array name="product_descriptions">
+        <item>Laptop dengan prosesor Intel Core i5, RAM 8GB, SSD 512GB.</item>
+        <item>Smartphone dengan layar 6.5 inci, RAM 6GB, memori internal 128GB.</item>
+        <item>Headphone nirkabel dengan peredam bising aktif.</item>
+        <item>Smartwatch dengan sensor oksigen darah dan fitur kesehatan lainnya.</item>
+        <item>Kamera mirrorless dengan sensor APS-C, 24.1 MP, 4K video.</item>
+        <item>Smart TV dengan layar QLED 4K, HDR10+.</item>
+        <item>Blender dengan motor 700W, 5 kecepatan, pisau baja tahan karat.</item>
+        <item>Setrika uap dengan lapisan titanium, pengatur suhu otomatis.</item>
+        <item>Microwave dengan kapasitas 42 liter, teknologi inverter.</item>
+        <item>Mesin cuci front load dengan kapasitas 7.5 kg, teknologi EcoBubble.</item>
+        <item>Kulkas 1 pintu dengan kapasitas 180 liter, hemat energi.</item>
+        <item>AC split ½ PK dengan teknologi inverter, hemat listrik.</item>
+        <item>Vacuum cleaner nirkabel dengan daya hisap tinggi, HEPA filter.</item>
+        <item>Kompor gas 2 tungku dengan bahan stainless steel, pengapian otomatis.</item>
+        <item>Rice cooker dengan kapasitas 2 liter, 8 menu otomatis.</item>
+    </string-array>
+
+    <string-array name="product_categories">
+        <item>Elektronik</item>
+        <item>Elektronik</item>
+        <item>Elektronik</item>
+        <item>Elektronik</item>
+        <item>Elektronik</item>
+        <item>Elektronik</item>
+        <item>Peralatan Rumah Tangga</item>
+        <item>Peralatan Rumah Tangga</item>
+        <item>Peralatan Rumah Tangga</item>
+        <item>Peralatan Rumah Tangga</item>
+        <item>Peralatan Rumah Tangga</item>
+        <item>Peralatan Rumah Tangga</item>
+        <item>Peralatan Rumah Tangga</item>
+        <item>Peralatan Rumah Tangga</item>
+        <item>Peralatan Rumah Tangga</item>
+    </string-array>
+
+    <integer-array  name="product_prices">
+        <item>8500000</item>
+        <item>4200000</item>
+        <item>3800000</item>
+        <item>7500000</item>
+        <item>9200000</item>
+        <item>12000000</item>
+        <item>850000</item>
+        <item>650000</item>
+        <item>2400000</item>
+        <item>4500000</item>
+        <item>2000000</item>
+        <item>3200000</item>
+        <item>9500000</item>
+        <item>400000</item>
+        <item>600000</item>
+    </integer-array>
+
+    <integer-array name="product_stocks">
+        <item>25</item>
+        <item>40</item>
+        <item>15</item>
+        <item>10</item>
+        <item>8</item>
+        <item>5</item>
+        <item>30</item>
+        <item>20</item>
+        <item>10</item>
+        <item>7</item>
+        <item>12</item>
+        <item>18</item>
+        <item>10</item>
+        <item>50</item>
+        <item>25</item>
+    </integer-array>
+
+    <integer-array name="product_images">
+        <item>@drawable/laptop_acer_aspire5</item>
+        <item>@drawable/samsung_a52</item>
+        <item>@drawable/sony_wh1000</item>
+        <item>@drawable/smartwatch_apple_series6</item>
+        <item>@drawable/canon_eos_m50</item>
+        <item>@drawable/tv_samsung_55_qled</item>
+        <item>@drawable/blender_philips_hr2221</item>
+        <item>@drawable/setrika_uap_panasonic_nie510t</item>
+        <item>@drawable/microwave_lg_ms4295sis</item>
+        <item>@drawable/mesin_cuci_samsung</item>
+        <item>@drawable/kulkas_sharp_sjx185mg</item>
+        <item>@drawable/ac_daikin</item>
+        <item>@drawable/vacuum_cleaner_dyson_v11</item>
+        <item>@drawable/kompor_gas_rinnai_ri522c</item>
+        <item>@drawable/rice_cooker_philips_hd3132</item>
+    </integer-array>
+</resources>

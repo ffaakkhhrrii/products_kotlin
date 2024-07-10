@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.cardview.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    app:cardCornerRadius="20dp"
+    android:padding="20dp"
+    app:cardBackgroundColor="?attr/colorPrimaryContainer"
+    android:layout_margin="10dp">
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="200dp"
+        android:orientation="vertical"
+        android:padding="10dp">
+
+        <ImageView
+            android:id="@+id/imgBarang"
+            android:layout_width="match_parent"
+            android:layout_height="500dp"
+            android:padding="5dp"
+            android:scaleType="fitXY"
+            android:contentDescription="@string/todo"
+            android:src="@drawable/ac_daikin"
+            android:layout_above="@id/tvNama"/>
+
+        <TextView
+            android:id="@+id/tvNama"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/example_nama_barang"
+            android:maxLines="1"
+            android:ellipsize="end"
+            android:layout_marginTop="5dp"
+            android:textColor="?attr/colorOnPrimaryContainer"
+            android:textSize="15sp"
+            android:textStyle="bold"
+            android:layout_above="@id/tvKategori"
+            android:gravity="center"/>
+        <TextView
+            android:id="@+id/tvKategori"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/example_kategori"
+            android:textSize="12sp"
+            android:layout_above="@id/tvHarga"
+            android:textColor="?attr/colorOnSurface"
+            android:gravity="center"/>
+        <TextView
+            android:id="@+id/tvHarga"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:textColor="?attr/colorOnSurface"
+            android:text="@string/example_harga"
+            android:textSize="12sp"
+            android:layout_alignParentBottom="true"
+            android:textStyle="italic"
+            android:gravity="center"/>
+    </RelativeLayout>
+
+</androidx.cardview.widget.CardView>
