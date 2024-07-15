@@ -1,32 +1,24 @@
 package com.fakhri.products.ui.fragment.profile
 
-import android.os.Build
 import android.os.Bundle
-import android.util.Log
 import android.view.LayoutInflater
-import android.view.RoundedCorner
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
-import androidx.annotation.RequiresApi
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
+import androidx.navigation.fragment.findNavController
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.resource.bitmap.RoundedCorners
-import com.fakhri.products.R
-import com.fakhri.products.data.ProductRepository
-import com.fakhri.products.data.model.user.GetUserResponse
+import com.fakhri.products.repository.product.ProductRepository
+import com.fakhri.products.data.network.model.user.Users
 import com.fakhri.products.data.utils.Result
 import com.fakhri.products.databinding.FragmentProfileBinding
 import com.fakhri.products.network.ApiConfig
+import com.fakhri.products.repository.user.UserRepository
 import kotlinx.coroutines.launch
-import java.text.SimpleDateFormat
-import java.time.LocalDate
-import java.time.format.DateTimeFormatter
-import java.util.Date
-import java.util.Locale
 
 class FragmentProfile : Fragment() {
 
@@ -45,11 +37,12 @@ class FragmentProfile : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        val repository = ProductRepository(ApiConfig.instance)
+        val repository = UserRepository(ApiConfig.instance,requireContext())
         val factory = FragmentProfileViewModelFactory(repository)
         viewModel = ViewModelProvider(this,factory).get(FragmentProfileViewModel::class.java)
 
-        viewModel.getUser(2)
+        val id = 2
+        viewModel.getUser(id)
         viewLifecycleOwner.lifecycleScope.launch {
             viewModel.dataUser.collect{
                 result->
@@ -69,9 +62,14 @@ class FragmentProfile : Fragment() {
                 }
             }
         }
+
+        binding.btnEditProfile.setOnClickListener {
+            val action = FragmentProfileDirections.actionFragmentProfileToFragmentEditProfile(id)
+            findNavController().navigate(action)
+        }
     }
 
-    private fun setDataUser(data: GetUserResponse){
+    private fun setDataUser(data: Users){
         Glide.with(requireActivity())
             .load(data.image)
             .transform(RoundedCorners(20))

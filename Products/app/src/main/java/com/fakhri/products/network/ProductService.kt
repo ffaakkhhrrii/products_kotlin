@@ -1,8 +1,8 @@
 package com.fakhri.products.network
 
-import com.fakhri.products.data.model.all.GetProductResponse
-import com.fakhri.products.data.model.detail.GetProductIdResponse
-import com.fakhri.products.data.model.user.GetUserResponse
+import com.fakhri.products.data.network.model.all.GetProductResponse
+import com.fakhri.products.data.network.model.detail.DetailProduct
+import com.fakhri.products.data.network.model.user.Users
 import retrofit2.Response
 import retrofit2.http.GET
 import retrofit2.http.Path
@@ -20,11 +20,11 @@ interface ProductService {
     @GET("products/{id}")
     suspend fun getProductId(
         @Path("id") id: Int
-    ): Response<GetProductIdResponse>
+    ): Response<DetailProduct>
 
     @GET("users/{id}")
     suspend fun getUsersId(
         @Path("id") id: Int
-    ): Response<GetUserResponse>
+    ): Response<Users>
 
 }

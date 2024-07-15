@@ -1,6 +1,8 @@
 package com.fakhri.products.ui.fragment.intent
 
 import android.app.Activity
+import android.content.ContentValues
+import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.graphics.Bitmap
@@ -21,6 +23,9 @@ import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import com.fakhri.products.databinding.FragmentIntentBinding
+import java.text.SimpleDateFormat
+import java.util.Date
+import java.util.Locale
 
 class FragmentIntent : Fragment() {
 
@@ -32,6 +37,11 @@ class FragmentIntent : Fragment() {
     private lateinit var imageView: ImageView
     private lateinit var btnGalery: Button
     private lateinit var btnCamera: Button
+    private val FILENAME_FORMAT = "yyyyMMdd_HHmmss"
+    private val timeStamp: String = SimpleDateFormat(FILENAME_FORMAT, Locale.getDefault()).format(
+        Date()
+    )
+    private var currentImageUri: Uri? = null
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -102,20 +112,41 @@ class FragmentIntent : Fragment() {
         }
     }
 
-    private var cameraLauncher = registerForActivityResult(ActivityResultContracts.StartActivityForResult()){
-        result ->
-        if (result.resultCode == Activity.RESULT_OK){
-            val data: Intent? = result.data
-            val bitmap = data?.extras?.get("data") as? Bitmap
-            if (bitmap != null) {
-                imageView.setImageBitmap(bitmap)
-            }
+    private fun showImageFromCamera(){
+        if (currentImageUri != null){
+            imageView.setImageURI(currentImageUri)
         }
     }
 
+    private var cameraLauncher = registerForActivityResult(ActivityResultContracts.TakePicture()){
+        if (it){
+            showImageFromCamera()
+        }else{
+            currentImageUri = null
+        }
+    }
+
+    fun getImageUri(context: Context): Uri {
+        var uri: Uri? = null
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+            val contentValues = ContentValues().apply {
+                put(MediaStore.MediaColumns.DISPLAY_NAME, "$timeStamp.jpg")
+                put(MediaStore.MediaColumns.MIME_TYPE, "image/jpeg")
+                put(MediaStore.MediaColumns.RELATIVE_PATH, "Pictures/MyCamera/")
+            }
+            uri = context.contentResolver.insert(
+                MediaStore.Images.Media.EXTERNAL_CONTENT_URI,
+                contentValues
+            )
+            // content://media/external/images/media/1000000062
+            // storage/emulated/0/Pictures/MyCamera/20230825_155303.jpg
+        }
+        return uri!!
+    }
+
     private fun openCamera() {
-        val intent  = Intent(MediaStore.ACTION_IMAGE_CAPTURE)
-        cameraLauncher.launch(intent)
+        currentImageUri = getImageUri(requireContext())
+        cameraLauncher.launch(currentImageUri)
     }
 
     override fun onDestroy() {
