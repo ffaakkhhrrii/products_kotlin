@@ -2,6 +2,7 @@ package com.fakhri.products.data.network.model.detail
 
 import androidx.room.Entity
 import androidx.room.PrimaryKey
+import com.fakhri.products.data.local.db.product.FavoriteProduct
 
 
 data class DetailProduct(
@@ -28,3 +29,30 @@ data class DetailProduct(
     val warrantyInformation: String = "",
     val weight: Int = 0
 )
+
+fun DetailProduct.toFavoriteProduct(): FavoriteProduct {
+    return FavoriteProduct(
+        id = this.id,
+        availabilityStatus = this.availabilityStatus,
+        brand = this.brand,
+        category = this.category,
+        description = this.description,
+        dimensions = this.dimensions,
+        discountPercentage = this.discountPercentage,
+        images = ArrayList(this.images),
+        meta = this.meta,
+        minimumOrderQuantity = this.minimumOrderQuantity,
+        price = this.price,
+        rating = this.rating,
+        returnPolicy = this.returnPolicy,
+        reviews = ArrayList(this.reviews),
+        shippingInformation = this.shippingInformation,
+        sku = this.sku,
+        stock = this.stock,
+        tags = ArrayList(this.tags),
+        thumbnail = this.thumbnail,
+        title = this.title,
+        warrantyInformation = this.warrantyInformation,
+        weight = this.weight
+    )
+}

@@ -19,6 +19,7 @@ import com.fakhri.products.data.local.db.product.FavoriteProduct
 import com.fakhri.products.repository.product.ProductRepository
 import com.fakhri.products.data.network.model.detail.DetailProduct
 import com.fakhri.products.data.network.model.detail.Review
+import com.fakhri.products.data.network.model.detail.toFavoriteProduct
 import com.fakhri.products.data.utils.Result
 import com.fakhri.products.databinding.FragmentDetailBinding
 import com.fakhri.products.network.ApiConfig
@@ -80,7 +81,7 @@ class DetailFragment : Fragment() {
                         setData(result.data)
                         binding.pbDetail.visibility = View.GONE
                         binding.btnFavorite.setOnClickListener {
-                            viewModel.toggleFavorite(FavoriteProduct(result.data.id))
+                            viewModel.toggleFavorite(result.data.toFavoriteProduct())
                         }
                     }
 

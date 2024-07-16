@@ -10,7 +10,8 @@ import com.fakhri.products.data.local.db.product.FavoriteProduct
 import com.fakhri.products.data.local.db.product.FavoriteProductDAO
 import com.fakhri.products.data.local.db.user.UserDAO
 import com.fakhri.products.data.network.model.user.Users
-import com.fakhri.products.data.utils.Converter
+import com.fakhri.products.data.utils.ConverterList
+import com.fakhri.products.data.utils.ConverterReview
 
 @Database(
     exportSchema = true, version = 2, entities = [FavoriteProduct::class,Users::class],
@@ -18,7 +19,7 @@ import com.fakhri.products.data.utils.Converter
         AutoMigration(from = 1, to = 2)
     ]
 )
-@TypeConverters(Converter::class)
+@TypeConverters(ConverterList::class,ConverterReview::class)
 abstract class AppDatabase : RoomDatabase() {
     abstract fun productDao(): FavoriteProductDAO
     abstract fun userDao(): UserDAO

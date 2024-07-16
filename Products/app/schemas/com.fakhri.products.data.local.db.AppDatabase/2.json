@@ -2,17 +2,199 @@
   "formatVersion": 1,
   "database": {
     "version": 2,
-    "identityHash": "27c3851347357f69316b6ac804bd2835",
+    "identityHash": "5ec1b375fcbee71fb919464cfa072b48",
     "entities": [
       {
         "tableName": "tb_favorite",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER NOT NULL, PRIMARY KEY(`id`))",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER NOT NULL, `availabilityStatus` TEXT NOT NULL DEFAULT '', `brand` TEXT NOT NULL DEFAULT '', `category` TEXT NOT NULL DEFAULT '', `description` TEXT NOT NULL DEFAULT '', `discountPercentage` REAL NOT NULL DEFAULT 0.0, `images` TEXT NOT NULL DEFAULT '[]', `minimumOrderQuantity` INTEGER NOT NULL DEFAULT 0, `price` REAL NOT NULL DEFAULT 0.0, `rating` REAL NOT NULL DEFAULT 0.0, `returnPolicy` TEXT NOT NULL DEFAULT '', `reviews` TEXT NOT NULL DEFAULT '[]', `shippingInformation` TEXT NOT NULL DEFAULT '', `sku` TEXT NOT NULL DEFAULT '', `stock` INTEGER NOT NULL DEFAULT 0, `tags` TEXT NOT NULL DEFAULT '[]', `thumbnail` TEXT NOT NULL DEFAULT '', `title` TEXT NOT NULL DEFAULT '', `warrantyInformation` TEXT NOT NULL DEFAULT '', `weight` INTEGER NOT NULL DEFAULT 0, `dimensions_depth` REAL NOT NULL DEFAULT 0.0, `dimensions_height` REAL NOT NULL DEFAULT 0.0, `dimensions_width` REAL NOT NULL DEFAULT 0.0, `meta_barcode` TEXT NOT NULL DEFAULT '', `meta_createdAt` TEXT NOT NULL DEFAULT '', `meta_qrCode` TEXT NOT NULL DEFAULT '', `meta_updatedAt` TEXT NOT NULL DEFAULT '', PRIMARY KEY(`id`))",
         "fields": [
           {
             "fieldPath": "id",
             "columnName": "id",
             "affinity": "INTEGER",
             "notNull": true
+          },
+          {
+            "fieldPath": "availabilityStatus",
+            "columnName": "availabilityStatus",
+            "affinity": "TEXT",
+            "notNull": true,
+            "defaultValue": "''"
+          },
+          {
+            "fieldPath": "brand",
+            "columnName": "brand",
+            "affinity": "TEXT",
+            "notNull": true,
+            "defaultValue": "''"
+          },
+          {
+            "fieldPath": "category",
+            "columnName": "category",
+            "affinity": "TEXT",
+            "notNull": true,
+            "defaultValue": "''"
+          },
+          {
+            "fieldPath": "description",
+            "columnName": "description",
+            "affinity": "TEXT",
+            "notNull": true,
+            "defaultValue": "''"
+          },
+          {
+            "fieldPath": "discountPercentage",
+            "columnName": "discountPercentage",
+            "affinity": "REAL",
+            "notNull": true,
+            "defaultValue": "0.0"
+          },
+          {
+            "fieldPath": "images",
+            "columnName": "images",
+            "affinity": "TEXT",
+            "notNull": true,
+            "defaultValue": "'[]'"
+          },
+          {
+            "fieldPath": "minimumOrderQuantity",
+            "columnName": "minimumOrderQuantity",
+            "affinity": "INTEGER",
+            "notNull": true,
+            "defaultValue": "0"
+          },
+          {
+            "fieldPath": "price",
+            "columnName": "price",
+            "affinity": "REAL",
+            "notNull": true,
+            "defaultValue": "0.0"
+          },
+          {
+            "fieldPath": "rating",
+            "columnName": "rating",
+            "affinity": "REAL",
+            "notNull": true,
+            "defaultValue": "0.0"
+          },
+          {
+            "fieldPath": "returnPolicy",
+            "columnName": "returnPolicy",
+            "affinity": "TEXT",
+            "notNull": true,
+            "defaultValue": "''"
+          },
+          {
+            "fieldPath": "reviews",
+            "columnName": "reviews",
+            "affinity": "TEXT",
+            "notNull": true,
+            "defaultValue": "'[]'"
+          },
+          {
+            "fieldPath": "shippingInformation",
+            "columnName": "shippingInformation",
+            "affinity": "TEXT",
+            "notNull": true,
+            "defaultValue": "''"
+          },
+          {
+            "fieldPath": "sku",
+            "columnName": "sku",
+            "affinity": "TEXT",
+            "notNull": true,
+            "defaultValue": "''"
+          },
+          {
+            "fieldPath": "stock",
+            "columnName": "stock",
+            "affinity": "INTEGER",
+            "notNull": true,
+            "defaultValue": "0"
+          },
+          {
+            "fieldPath": "tags",
+            "columnName": "tags",
+            "affinity": "TEXT",
+            "notNull": true,
+            "defaultValue": "'[]'"
+          },
+          {
+            "fieldPath": "thumbnail",
+            "columnName": "thumbnail",
+            "affinity": "TEXT",
+            "notNull": true,
+            "defaultValue": "''"
+          },
+          {
+            "fieldPath": "title",
+            "columnName": "title",
+            "affinity": "TEXT",
+            "notNull": true,
+            "defaultValue": "''"
+          },
+          {
+            "fieldPath": "warrantyInformation",
+            "columnName": "warrantyInformation",
+            "affinity": "TEXT",
+            "notNull": true,
+            "defaultValue": "''"
+          },
+          {
+            "fieldPath": "weight",
+            "columnName": "weight",
+            "affinity": "INTEGER",
+            "notNull": true,
+            "defaultValue": "0"
+          },
+          {
+            "fieldPath": "dimensions.depth",
+            "columnName": "dimensions_depth",
+            "affinity": "REAL",
+            "notNull": true,
+            "defaultValue": "0.0"
+          },
+          {
+            "fieldPath": "dimensions.height",
+            "columnName": "dimensions_height",
+            "affinity": "REAL",
+            "notNull": true,
+            "defaultValue": "0.0"
+          },
+          {
+            "fieldPath": "dimensions.width",
+            "columnName": "dimensions_width",
+            "affinity": "REAL",
+            "notNull": true,
+            "defaultValue": "0.0"
+          },
+          {
+            "fieldPath": "meta.barcode",
+            "columnName": "meta_barcode",
+            "affinity": "TEXT",
+            "notNull": true,
+            "defaultValue": "''"
+          },
+          {
+            "fieldPath": "meta.createdAt",
+            "columnName": "meta_createdAt",
+            "affinity": "TEXT",
+            "notNull": true,
+            "defaultValue": "''"
+          },
+          {
+            "fieldPath": "meta.qrCode",
+            "columnName": "meta_qrCode",
+            "affinity": "TEXT",
+            "notNull": true,
+            "defaultValue": "''"
+          },
+          {
+            "fieldPath": "meta.updatedAt",
+            "columnName": "meta_updatedAt",
+            "affinity": "TEXT",
+            "notNull": true,
+            "defaultValue": "''"
           }
         ],
         "primaryKey": {
@@ -26,24 +208,12 @@
       },
       {
         "tableName": "tb_user",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER NOT NULL, `address` TEXT NOT NULL, `bank` TEXT NOT NULL, `birthDate` TEXT NOT NULL, `bloodGroup` TEXT NOT NULL, `email` TEXT NOT NULL, `firstName` TEXT NOT NULL, `image` TEXT NOT NULL, `lastName` TEXT NOT NULL, `phone` TEXT NOT NULL, `role` TEXT NOT NULL, `university` TEXT NOT NULL, `username` TEXT NOT NULL, PRIMARY KEY(`id`))",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER NOT NULL, `birthDate` TEXT NOT NULL, `bloodGroup` TEXT NOT NULL, `email` TEXT NOT NULL, `firstName` TEXT NOT NULL, `image` TEXT NOT NULL, `lastName` TEXT NOT NULL, `phone` TEXT NOT NULL, `role` TEXT NOT NULL, `university` TEXT NOT NULL, `username` TEXT NOT NULL, `address_address` TEXT NOT NULL, `bank_cardExpire` TEXT NOT NULL, `bank_cardNumber` TEXT NOT NULL, `bank_cardType` TEXT NOT NULL, `bank_currency` TEXT NOT NULL, `bank_iban` TEXT NOT NULL, PRIMARY KEY(`id`))",
         "fields": [
           {
             "fieldPath": "id",
             "columnName": "id",
             "affinity": "INTEGER",
-            "notNull": true
-          },
-          {
-            "fieldPath": "address",
-            "columnName": "address",
-            "affinity": "TEXT",
-            "notNull": true
-          },
-          {
-            "fieldPath": "bank",
-            "columnName": "bank",
-            "affinity": "TEXT",
             "notNull": true
           },
           {
@@ -105,6 +275,42 @@
             "columnName": "username",
             "affinity": "TEXT",
             "notNull": true
+          },
+          {
+            "fieldPath": "address.address",
+            "columnName": "address_address",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "bank.cardExpire",
+            "columnName": "bank_cardExpire",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "bank.cardNumber",
+            "columnName": "bank_cardNumber",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "bank.cardType",
+            "columnName": "bank_cardType",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "bank.currency",
+            "columnName": "bank_currency",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "bank.iban",
+            "columnName": "bank_iban",
+            "affinity": "TEXT",
+            "notNull": true
           }
         ],
         "primaryKey": {
@@ -120,7 +326,7 @@
     "views": [],
     "setupQueries": [
       "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
-      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '27c3851347357f69316b6ac804bd2835')"
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '5ec1b375fcbee71fb919464cfa072b48')"
     ]
   }
 }
