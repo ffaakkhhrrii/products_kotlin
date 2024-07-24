@@ -15,14 +15,17 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.resource.bitmap.RoundedCorners
 import com.fakhri.products.R
-import com.fakhri.products.data.local.db.product.FavoriteProduct
-import com.fakhri.products.repository.product.ProductRepository
-import com.fakhri.products.data.network.model.detail.DetailProduct
-import com.fakhri.products.data.network.model.detail.Review
-import com.fakhri.products.data.network.model.detail.toFavoriteProduct
+import com.fakhri.products.data.repository.ProductRepository
+import com.fakhri.products.data.network.response.detail.DetailProduct
+import com.fakhri.products.data.network.response.detail.Review
+import com.fakhri.products.data.network.response.detail.toFavoriteProduct
 import com.fakhri.products.data.utils.Result
 import com.fakhri.products.databinding.FragmentDetailBinding
-import com.fakhri.products.network.ApiConfig
+import com.fakhri.products.data.network.api.ApiConfig
+import com.fakhri.products.domain.usecase.AddFavoriteUseCase
+import com.fakhri.products.domain.usecase.DeleteFavoriteUseCase
+import com.fakhri.products.domain.usecase.GetDetailProductUseCase
+import com.fakhri.products.domain.usecase.IsFavoriteUseCase
 import kotlinx.coroutines.launch
 import java.text.NumberFormat
 import java.util.Locale
@@ -50,7 +53,16 @@ class DetailFragment : Fragment() {
             apiService = apiService,
             context = requireContext()
         )
-        val factory = DetailFragmentViewModelFactory(repository)
+        val getDetailProductUseCase = GetDetailProductUseCase(repository)
+        val isFavoriteUseCase = IsFavoriteUseCase(repository)
+        val addFavoriteUseCase = AddFavoriteUseCase(repository)
+        val deleteFavoriteUseCase = DeleteFavoriteUseCase(repository)
+        val factory = DetailFragmentViewModelFactory(
+            getDetailProductUseCase,
+            isFavoriteUseCase,
+            addFavoriteUseCase,
+            deleteFavoriteUseCase
+        )
         viewModel = ViewModelProvider(this, factory).get(DetailFragmentViewModel::class.java)
 
         binding.btnBack.setOnClickListener {
@@ -60,10 +72,10 @@ class DetailFragment : Fragment() {
         val productId = args.productsId
         viewModel.getDetailData(productId)
         viewModel.checkFavorite(productId)
-        viewModel.isFavorite.observe(viewLifecycleOwner){
-            if (it){
+        viewModel.isFavorite.observe(viewLifecycleOwner) {
+            if (it) {
                 binding.btnFavorite.setImageResource(R.drawable.ic_filled_favorite)
-            }else{
+            } else {
                 binding.btnFavorite.setImageResource(R.drawable.ic_unfilled_favorite)
             }
         }
@@ -81,7 +93,12 @@ class DetailFragment : Fragment() {
                         setData(result.data)
                         binding.pbDetail.visibility = View.GONE
                         binding.btnFavorite.setOnClickListener {
-                            viewModel.toggleFavorite(result.data.toFavoriteProduct())
+                            try {
+                                viewModel.toggleFavorite(result.data.toFavoriteProduct())
+                                Log.e("AddToFavorite","Product is added")
+                            }catch (e: Exception){
+                                Log.e("AddToFavorite",e.message.toString())
+                            }
                         }
                     }
 

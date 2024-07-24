@@ -2,8 +2,8 @@ package com.fakhri.products.data.network.paging
 
 import androidx.paging.PagingSource
 import androidx.paging.PagingState
-import com.fakhri.products.data.network.model.all.Product
-import com.fakhri.products.network.ProductService
+import com.fakhri.products.data.network.response.all.Product
+import com.fakhri.products.data.network.api.ProductService
 
 const val page = 10
 class ProductsPagingSource(

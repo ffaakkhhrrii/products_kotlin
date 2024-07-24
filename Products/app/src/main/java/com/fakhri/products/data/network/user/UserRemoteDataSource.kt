@@ -1,6 +1,6 @@
 package com.fakhri.products.data.network.user
 
-import com.fakhri.products.data.network.model.user.Users
+import com.fakhri.products.data.network.response.user.Users
 import retrofit2.Response
 
 interface UserRemoteDataSource {

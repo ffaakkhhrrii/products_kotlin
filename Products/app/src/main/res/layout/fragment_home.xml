@@ -25,5 +25,14 @@
         android:layout_centerInParent="true"
         android:visibility="visible" />
 
+    <com.google.android.material.floatingactionbutton.FloatingActionButton
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentEnd="true"
+        android:layout_alignParentBottom="true"
+        android:layout_margin="20dp"
+        android:contentDescription="@string/todo"
+        android:src="@drawable/ic_filled_favorite"
+        android:id="@+id/btnToFavorite"/>
 
 </RelativeLayout>

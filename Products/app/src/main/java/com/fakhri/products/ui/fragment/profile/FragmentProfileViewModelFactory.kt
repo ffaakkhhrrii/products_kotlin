@@ -2,11 +2,13 @@ package com.fakhri.products.ui.fragment.profile
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
-import com.fakhri.products.repository.product.IProductRepository
-import com.fakhri.products.repository.user.IUserRepository
+import com.fakhri.products.domain.IUserRepository
+import com.fakhri.products.domain.usecase.GetUserUseCase
 
-class FragmentProfileViewModelFactory(private val repository: IUserRepository):ViewModelProvider.Factory {
+class FragmentProfileViewModelFactory(
+    private val getUserUseCase: GetUserUseCase
+):ViewModelProvider.Factory {
     override fun <T : ViewModel> create(modelClass: Class<T>): T {
-        return FragmentProfileViewModel(repository) as T
+        return FragmentProfileViewModel(getUserUseCase) as T
     }
 }

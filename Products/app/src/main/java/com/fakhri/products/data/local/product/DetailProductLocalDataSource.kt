@@ -1,9 +1,11 @@
 package com.fakhri.products.data.local.product
 
-import com.fakhri.products.data.local.db.product.FavoriteProduct
+import androidx.paging.PagingSource
+import com.fakhri.products.data.local.db.product.FavoriteProductEntity
 
 interface DetailProductLocalDataSource {
-    fun getProduct(id: Int): FavoriteProduct
-    suspend fun saveProduct(favoriteProduct: FavoriteProduct)
-    suspend fun deleteProduct(favoriteProduct: FavoriteProduct)
+    fun getProduct(id: Int): FavoriteProductEntity
+    suspend fun saveProduct(favoriteProductEntity: FavoriteProductEntity)
+    suspend fun deleteProduct(favoriteProductEntity: FavoriteProductEntity)
+    fun getAllProduct(): PagingSource<Int,FavoriteProductEntity>
 }

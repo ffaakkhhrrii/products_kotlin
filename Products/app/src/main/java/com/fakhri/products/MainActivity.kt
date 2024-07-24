@@ -28,7 +28,7 @@ class MainActivity : AppCompatActivity() {
         binding.bottomMenu.setupWithNavController(navController)
 
         navController.addOnDestinationChangedListener { _, destination, _ ->
-            if (destination.id == R.id.detailFragment ||destination.id == R.id.fragmentEditProfile) {
+            if (destination.id == R.id.fragmentFavorite||destination.id == R.id.detailFragment ||destination.id == R.id.fragmentEditProfile) {
                 binding.bottomMenu.visibility = View.GONE
             } else {
                 binding.bottomMenu.visibility = View.VISIBLE

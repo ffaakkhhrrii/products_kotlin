@@ -1,9 +1,7 @@
 package com.fakhri.products.data.utils
 
 import androidx.room.TypeConverter
-import com.fakhri.products.data.network.model.detail.Review
-import com.fakhri.products.data.network.model.user.Address
-import com.fakhri.products.data.network.model.user.Bank
+import com.fakhri.products.data.network.response.detail.Review
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
 

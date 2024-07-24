@@ -11,13 +11,16 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import com.bumptech.glide.Glide
+import com.bumptech.glide.load.resource.bitmap.CenterCrop
 import com.bumptech.glide.load.resource.bitmap.RoundedCorners
-import com.fakhri.products.repository.product.ProductRepository
-import com.fakhri.products.data.network.model.user.Users
+import com.fakhri.products.R
+import com.fakhri.products.data.local.db.user.UsersEntity
+import com.fakhri.products.data.network.response.user.Users
 import com.fakhri.products.data.utils.Result
 import com.fakhri.products.databinding.FragmentProfileBinding
-import com.fakhri.products.network.ApiConfig
-import com.fakhri.products.repository.user.UserRepository
+import com.fakhri.products.data.network.api.ApiConfig
+import com.fakhri.products.data.repository.UserRepository
+import com.fakhri.products.domain.usecase.GetUserUseCase
 import kotlinx.coroutines.launch
 
 class FragmentProfile : Fragment() {
@@ -38,7 +41,8 @@ class FragmentProfile : Fragment() {
         super.onViewCreated(view, savedInstanceState)
 
         val repository = UserRepository(ApiConfig.instance,requireContext())
-        val factory = FragmentProfileViewModelFactory(repository)
+        val getUserUseCase = GetUserUseCase(repository)
+        val factory = FragmentProfileViewModelFactory(getUserUseCase)
         viewModel = ViewModelProvider(this,factory).get(FragmentProfileViewModel::class.java)
 
         val id = 2
@@ -69,10 +73,12 @@ class FragmentProfile : Fragment() {
         }
     }
 
-    private fun setDataUser(data: Users){
+    private fun setDataUser(data: UsersEntity){
         Glide.with(requireActivity())
             .load(data.image)
             .transform(RoundedCorners(20))
+            .placeholder(R.drawable.ic_launcher_background)
+            .transform(CenterCrop())
             .into(binding.imgUser)
         binding.tvName.text = "${data.firstName} ${data.lastName}"
         binding.tvEmail.text = data.email
@@ -80,10 +86,10 @@ class FragmentProfile : Fragment() {
         binding.tvBirthday.text = data.birthDate
         binding.tvRole.text = data.role
         binding.tvUsername.text = data.username
-        binding.tvAddress.text = data.address.address
+        binding.tvAddress.text = data.address
         binding.tvUniversity.text = data.university
         binding.tvBloodType.text = data.bloodGroup
-        binding.tvCreditCard.text = data.bank.cardNumber
+        binding.tvCreditCard.text = data.cardNumber
     }
 
     override fun onDestroy() {

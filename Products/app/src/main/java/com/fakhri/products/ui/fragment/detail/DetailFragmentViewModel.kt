@@ -4,16 +4,24 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.fakhri.products.data.local.db.product.FavoriteProduct
-import com.fakhri.products.data.network.model.detail.DetailProduct
+import com.fakhri.products.data.local.db.product.FavoriteProductEntity
+import com.fakhri.products.data.network.response.detail.DetailProduct
 import com.fakhri.products.data.utils.Result
-import com.fakhri.products.repository.product.IProductRepository
+import com.fakhri.products.domain.usecase.AddFavoriteUseCase
+import com.fakhri.products.domain.usecase.DeleteFavoriteUseCase
+import com.fakhri.products.domain.usecase.GetDetailProductUseCase
+import com.fakhri.products.domain.usecase.IsFavoriteUseCase
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 
-class DetailFragmentViewModel(private val repos: IProductRepository) : ViewModel() {
+class DetailFragmentViewModel(
+    private val getDetailProductUseCase: GetDetailProductUseCase,
+    private val isFavoriteUseCase: IsFavoriteUseCase,
+    private val addFavoriteUseCase: AddFavoriteUseCase,
+    private val deleteFavoriteUseCase: DeleteFavoriteUseCase
+) : ViewModel() {
     private var _detailData = MutableStateFlow<Result<DetailProduct>>(Result.Loading)
     val detailData: StateFlow<Result<DetailProduct>> = _detailData
 
@@ -22,8 +30,7 @@ class DetailFragmentViewModel(private val repos: IProductRepository) : ViewModel
 
     fun checkFavorite(id: Int){
         viewModelScope.launch(Dispatchers.IO) {
-            val validation = repos.isFavorite(id)
-            if (validation){
+            if (isFavoriteUseCase(id)){
                 _isFavorite.postValue(true)
             }else{
                 _isFavorite.postValue(false)
@@ -31,13 +38,13 @@ class DetailFragmentViewModel(private val repos: IProductRepository) : ViewModel
         }
     }
 
-    fun toggleFavorite(favoriteProduct: FavoriteProduct){
+    fun toggleFavorite(favoriteProductEntity: FavoriteProductEntity){
         viewModelScope.launch(Dispatchers.IO) {
             if (_isFavorite.value == true){
-                repos.unFavoriteProduct(favoriteProduct)
+                deleteFavoriteUseCase(favoriteProductEntity)
                 _isFavorite.postValue(false)
             }else{
-                repos.addToFavorite(favoriteProduct)
+                addFavoriteUseCase(favoriteProductEntity)
                 _isFavorite.postValue(true)
             }
         }
@@ -47,7 +54,7 @@ class DetailFragmentViewModel(private val repos: IProductRepository) : ViewModel
         viewModelScope.launch(Dispatchers.IO) {
             _detailData.value = Result.Loading
             try {
-                repos.getProduct(id).collect {
+                getDetailProductUseCase(id).collect {
                     _detailData.value = it
                 }
             } catch (e: Exception) {

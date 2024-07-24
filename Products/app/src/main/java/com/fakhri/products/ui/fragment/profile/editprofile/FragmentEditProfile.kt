@@ -5,18 +5,18 @@ import android.app.Activity
 import android.content.ContentValues
 import android.content.Context
 import android.content.Intent
-import android.media.MediaScannerConnection
 import android.net.Uri
 import android.os.Build
 import android.os.Bundle
+import android.os.Environment
 import android.provider.MediaStore
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
-import androidx.activity.result.PickVisualMediaRequest
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.annotation.RequiresApi
+import androidx.core.content.FileProvider
 import androidx.core.net.toUri
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
@@ -26,21 +26,22 @@ import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.resource.bitmap.CenterCrop
-import com.bumptech.glide.load.resource.bitmap.RoundedCorners
 import com.fakhri.products.R
-import com.fakhri.products.data.network.model.user.Address
-import com.fakhri.products.data.network.model.user.Bank
-import com.fakhri.products.data.network.model.user.Users
+import com.fakhri.products.data.local.db.user.UsersEntity
+import com.fakhri.products.data.network.response.user.Address
+import com.fakhri.products.data.network.response.user.Bank
+import com.fakhri.products.data.network.response.user.Users
 import com.fakhri.products.data.utils.Result
 import com.fakhri.products.databinding.FragmentEditProfileBinding
-import com.fakhri.products.network.ApiConfig
-import com.fakhri.products.repository.user.UserRepository
+import com.fakhri.products.data.network.api.ApiConfig
+import com.fakhri.products.data.repository.UserRepository
+import com.fakhri.products.domain.usecase.ChangeUserUseCase
+import com.fakhri.products.domain.usecase.GetUserFromDBUseCase
+import com.fakhri.products.domain.usecase.ResetUserUseCase
 import com.google.android.material.datepicker.MaterialDatePicker
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import kotlinx.coroutines.launch
 import java.io.File
-import java.io.FileOutputStream
-import java.io.IOException
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
@@ -73,7 +74,14 @@ class FragmentEditProfile : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         val repository = UserRepository(ApiConfig.instance, requireContext())
-        val factory = FragmentEditProfileViewModelFactory(repository)
+        val getUserFromDBUseCase = GetUserFromDBUseCase(repository)
+        val changeUserUseCase = ChangeUserUseCase(repository)
+        val resetUserUseCase = ResetUserUseCase(repository)
+        val factory = FragmentEditProfileViewModelFactory(
+            getUserFromDBUseCase,
+            changeUserUseCase,
+            resetUserUseCase
+        )
         viewModel = ViewModelProvider(this, factory).get(FragmentEditProfileViewModel::class.java)
 
         val userId = args.id
@@ -124,7 +132,11 @@ class FragmentEditProfile : Fragment() {
 
         binding.btnPickGalery.setOnClickListener {
             currentRequestCode = REQUEST_CODE_GALERY
-            requestPermission.launch(Manifest.permission.READ_MEDIA_IMAGES)
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                requestPermission.launch(Manifest.permission.READ_MEDIA_IMAGES)
+            } else {
+                requestPermission.launch(Manifest.permission.READ_EXTERNAL_STORAGE)
+            }
         }
 
         binding.btnPickPhoto.setOnClickListener {
@@ -162,11 +174,11 @@ class FragmentEditProfile : Fragment() {
         datePicker.show(parentFragmentManager, "BirthDate")
     }
 
-    private fun addData(id: Int): Users {
-        return Users(
+    private fun addData(id: Int): UsersEntity {
+        return UsersEntity(
             id = id,
-            address = Address(address = binding.editTextAddress.text.toString()),
-            bank = Bank(cardNumber = binding.editTextCreditNumber.text.toString()),
+            address = binding.editTextAddress.text.toString(),
+            cardNumber = binding.editTextCreditNumber.text.toString(),
             birthDate = binding.editTextBirthdate.text.toString(),
             bloodGroup = binding.editTextBloodType.text.toString(),
             email = binding.editTextEmail.text.toString(),
@@ -180,7 +192,7 @@ class FragmentEditProfile : Fragment() {
         )
     }
 
-    private fun setDataUser(users: Users) {
+    private fun setDataUser(users: UsersEntity) {
         binding.edtFirstName.setText(users.firstName)
         binding.edtLastName.setText(users.lastName)
         binding.editTextEmail.setText(users.email)
@@ -188,14 +200,13 @@ class FragmentEditProfile : Fragment() {
         binding.editTextBirthdate.setText(users.birthDate)
         binding.editTextRole.setText(users.role)
         binding.editTextUsername.setText(users.username)
-        binding.editTextAddress.setText(users.address.address)
+        binding.editTextAddress.setText(users.address)
         binding.editTextEducation.setText(users.university)
         binding.editTextBloodType.setText(users.bloodGroup)
-        binding.editTextCreditNumber.setText(users.bank.cardNumber)
+        binding.editTextCreditNumber.setText(users.cardNumber)
         Glide.with(requireActivity())
             .load(users.image)
             .placeholder(R.drawable.ic_launcher_background)
-            .override(100,100)
             .transform(CenterCrop())
             .into(binding.imgProfile)
         currentSelectedImage = users.image.toUri()
@@ -257,8 +268,22 @@ class FragmentEditProfile : Fragment() {
                 MediaStore.Images.Media.EXTERNAL_CONTENT_URI,
                 contentValues
             )
+        } else {
+            getImageUriForPreQ(requireContext())
         }
         return uri!!
+    }
+
+    private fun getImageUriForPreQ(context: Context): Uri {
+        val filesDir = context.getExternalFilesDir(Environment.DIRECTORY_PICTURES)
+        val imageFile = File(filesDir, "/Products/$timeStamp.jpg")
+        if (imageFile.parentFile?.exists() == false) imageFile.parentFile?.mkdir()
+        return FileProvider.getUriForFile(
+            context,
+            "${requireContext().packageName}.fileprovider",
+            imageFile
+        )
+        //content://com.dicoding.picodiploma.mycamera.fileprovider/my_images/MyCamera/20230825_133659.jpg
     }
 
     private fun showDialogDenied() {

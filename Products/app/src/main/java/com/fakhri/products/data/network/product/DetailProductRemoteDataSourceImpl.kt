@@ -1,7 +1,7 @@
 package com.fakhri.products.data.network.product
 
-import com.fakhri.products.data.network.model.detail.DetailProduct
-import com.fakhri.products.network.ProductService
+import com.fakhri.products.data.network.response.detail.DetailProduct
+import com.fakhri.products.data.network.api.ProductService
 import retrofit2.Response
 
 class DetailProductRemoteDataSourceImpl(

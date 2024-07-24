@@ -1,23 +1,20 @@
 package com.fakhri.products.data.local.db
 
 import android.content.Context
-import androidx.room.AutoMigration
 import androidx.room.Database
 import androidx.room.Room
 import androidx.room.RoomDatabase
 import androidx.room.TypeConverters
-import com.fakhri.products.data.local.db.product.FavoriteProduct
+import com.fakhri.products.data.local.db.product.FavoriteProductEntity
 import com.fakhri.products.data.local.db.product.FavoriteProductDAO
 import com.fakhri.products.data.local.db.user.UserDAO
-import com.fakhri.products.data.network.model.user.Users
+import com.fakhri.products.data.local.db.user.UsersEntity
+import com.fakhri.products.data.network.response.user.Users
 import com.fakhri.products.data.utils.ConverterList
 import com.fakhri.products.data.utils.ConverterReview
 
 @Database(
-    exportSchema = true, version = 2, entities = [FavoriteProduct::class,Users::class],
-    autoMigrations = [
-        AutoMigration(from = 1, to = 2)
-    ]
+    exportSchema = true, version = 1, entities = [FavoriteProductEntity::class,UsersEntity::class]
 )
 @TypeConverters(ConverterList::class,ConverterReview::class)
 abstract class AppDatabase : RoomDatabase() {
@@ -35,7 +32,7 @@ abstract class AppDatabase : RoomDatabase() {
                         context,
                         AppDatabase::class.java,
                         "db_product"
-                    ).build()
+                    ).fallbackToDestructiveMigration().build()
                     INSTANCE = instance
                 }
                 return instance

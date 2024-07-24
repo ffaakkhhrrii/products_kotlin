@@ -3,6 +3,7 @@ plugins {
     alias(libs.plugins.jetbrains.kotlin.android)
     id("androidx.navigation.safeargs.kotlin")
     id("org.jetbrains.kotlin.kapt")
+    alias(libs.plugins.google.gms.google.services)
     //id ("androidx.room")
 }
 
@@ -18,11 +19,11 @@ android {
         versionName = "1.0"
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         buildConfigField("String", "BASE_URL", "\"https://dummyjson.com/\"")
-        kapt{
-            arguments{
-                arg("room.schemaLocation","$projectDir/schemas")
-            }
-        }
+//        kapt{
+//            arguments{
+//                arg("room.schemaLocation","$projectDir/schemas")
+//            }
+//        }
     }
 
     buildTypes {
@@ -66,11 +67,14 @@ dependencies {
 
     // ViewModel + Coroutines
     implementation("androidx.lifecycle:lifecycle-viewmodel-ktx:2.3.1")
+    implementation(libs.firebase.messaging)
 
     val room_version = "2.6.1"
     implementation("androidx.room:room-runtime:$room_version")
     kapt("androidx.room:room-compiler:$room_version")
     implementation("androidx.room:room-ktx:$room_version")
+    //implementation("androidx.paging:paging-runtime:$room_version")
+    implementation ("androidx.room:room-paging:$room_version")
 
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.appcompat)

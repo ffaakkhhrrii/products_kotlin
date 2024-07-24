@@ -13,6 +13,9 @@
         <action
             android:id="@+id/action_homeFragment_to_detailFragment"
             app:destination="@id/detailFragment" />
+        <action
+            android:id="@+id/action_homeFragment_to_fragmentFavorite"
+            app:destination="@id/fragmentFavorite" />
     </fragment>
     <fragment
         android:id="@+id/detailFragment"
@@ -45,5 +48,14 @@
         <argument
             android:name="id"
             app:argType="integer" />
+    </fragment>
+    <fragment
+        android:id="@+id/fragmentFavorite"
+        android:name="com.fakhri.products.ui.fragment.favorite.FragmentFavorite"
+        android:label="fragment_favorite"
+        tools:layout="@layout/fragment_favorite" >
+        <action
+            android:id="@+id/action_fragmentFavorite_to_detailFragment"
+            app:destination="@id/detailFragment" />
     </fragment>
 </navigation>

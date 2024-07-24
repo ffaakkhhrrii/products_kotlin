@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "216410656066",
+    "project_id": "products-d476c",
+    "storage_bucket": "products-d476c.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:216410656066:android:c88881968ef46b3bac4cdb",
+        "android_client_info": {
+          "package_name": "com.fakhri.products"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyA3tl735amWD_SakKhtoH2O0pwAtoRIGSQ"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

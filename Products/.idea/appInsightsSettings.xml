@@ -8,10 +8,10 @@
             <InsightsFilterSettings>
               <option name="connection">
                 <ConnectionSetting>
-                  <option name="appId" value="PLACEHOLDER" />
-                  <option name="mobileSdkAppId" value="" />
-                  <option name="projectId" value="" />
-                  <option name="projectNumber" value="" />
+                  <option name="appId" value="com.fakhri.products" />
+                  <option name="mobileSdkAppId" value="1:216410656066:android:c88881968ef46b3bac4cdb" />
+                  <option name="projectId" value="products-d476c" />
+                  <option name="projectNumber" value="216410656066" />
                 </ConnectionSetting>
               </option>
               <option name="signal" value="SIGNAL_UNSPECIFIED" />

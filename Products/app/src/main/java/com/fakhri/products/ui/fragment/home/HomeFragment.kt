@@ -12,11 +12,12 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import androidx.paging.LoadState
-import com.fakhri.products.repository.product.ProductRepository
+import com.fakhri.products.data.repository.ProductRepository
 import com.fakhri.products.data.network.paging.ProductPagingAdapter
 import com.fakhri.products.data.utils.Result
 import com.fakhri.products.databinding.FragmentHomeBinding
-import com.fakhri.products.network.ApiConfig
+import com.fakhri.products.data.network.api.ApiConfig
+import com.fakhri.products.domain.usecase.GetProductsUseCase
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 
@@ -39,7 +40,8 @@ class HomeFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         val repository = ProductRepository(ApiConfig.instance,requireContext())
-        val factory = HomeFragmentViewModelFactory(repository)
+        val getProductsUseCase = GetProductsUseCase(repository)
+        val factory = HomeFragmentViewModelFactory(getProductsUseCase)
         viewModel = ViewModelProvider(this, factory).get(HomeFragmentViewModel::class.java)
         setUpRecycler()
     }
@@ -82,6 +84,10 @@ class HomeFragment : Fragment() {
                     }
                 }
             }
+        }
+        binding.btnToFavorite.setOnClickListener {
+            val action = HomeFragmentDirections.actionHomeFragmentToFragmentFavorite()
+            findNavController().navigate(action)
         }
     }
 
