@@ -1,35 +1,28 @@
 package com.fakhri.products.data.repository
 
-import android.content.Context
 import android.util.Log
-import com.fakhri.products.data.local.db.AppDatabase
 import com.fakhri.products.data.local.db.user.UsersEntity
-import com.fakhri.products.data.local.user.UserLocalDataSourceImpl
+import com.fakhri.products.data.local.user.UserLocalDataSource
 import com.fakhri.products.data.network.response.user.Users
-import com.fakhri.products.data.network.user.UserRemoteDataSourceImpl
-import com.fakhri.products.data.network.api.ProductService
 import com.fakhri.products.data.network.response.user.toEntity
+import com.fakhri.products.data.network.user.UserRemoteDataSource
+import com.fakhri.products.data.utils.Resource
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
-import com.fakhri.products.data.utils.Result
 import com.fakhri.products.domain.IUserRepository
+import javax.inject.Inject
 
-class UserRepository(
-    private val api: ProductService,
-    private val context: Context
+class UserRepository @Inject constructor(
+    private val localDataSource: UserLocalDataSource,
+    private val remoteDataSource: UserRemoteDataSource
 ) : IUserRepository {
-
-    private val dao = AppDatabase.getInstance(context).userDao()
-    private val remoteDataSource = UserRemoteDataSourceImpl(api)
-    private val localDataSource = UserLocalDataSourceImpl(dao)
-
-    override fun getUser(id: Int): Flow<Result<UsersEntity>> {
+    override fun getUser(id: Int): Flow<Resource<UsersEntity>> {
         return flow {
-            emit(Result.Loading)
+            emit(Resource.Loading())
             try {
-                emit(Result.Success(getData(id)))
+                emit(Resource.Success(getData(id)))
             } catch (e: Exception) {
-                emit(Result.Failure(e))
+                emit(Resource.Error(e.message.toString()))
             }
         }
     }
@@ -42,18 +35,17 @@ class UserRepository(
         localDataSource.deleteUser(id)
     }
 
-    override fun getUserFromDB(id: Int): Flow<Result<UsersEntity>> {
+    override fun getUserFromDB(id: Int): Flow<Resource<UsersEntity>> {
         return flow {
-            emit(Result.Loading)
+            emit(Resource.Loading())
             try {
-                emit(Result.Success(localDataSource.getUser(id)))
+                emit(Resource.Success(localDataSource.getUser(id)))
             } catch (e: Exception) {
                 Log.i("DBProducts", e.message.toString())
-                emit(Result.Failure(e))
+                emit(Resource.Error(e.message.toString()))
             }
         }
     }
-
 
     private suspend fun getData(id: Int): UsersEntity {
         var user: UsersEntity? = null

@@ -13,4 +13,8 @@
     <string name="_01_jun_2006">01 Jun 2006</string>
     <string name="jakarta">Jakarta</string>
     <string name="todo">todo</string>
+    <string name="error">Error</string>
+    <string name="failed_to_fetch_genres">Failed to fetch data</string>
+    <string name="close">Close</string>
+    <string name="try_again">Try Again</string>
 </resources>

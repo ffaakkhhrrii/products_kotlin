@@ -7,6 +7,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.viewModels
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
@@ -19,22 +20,22 @@ import com.fakhri.products.data.repository.ProductRepository
 import com.fakhri.products.data.network.response.detail.DetailProduct
 import com.fakhri.products.data.network.response.detail.Review
 import com.fakhri.products.data.network.response.detail.toFavoriteProduct
-import com.fakhri.products.data.utils.Result
 import com.fakhri.products.databinding.FragmentDetailBinding
-import com.fakhri.products.data.network.api.ApiConfig
-import com.fakhri.products.domain.usecase.AddFavoriteUseCase
-import com.fakhri.products.domain.usecase.DeleteFavoriteUseCase
-import com.fakhri.products.domain.usecase.GetDetailProductUseCase
-import com.fakhri.products.domain.usecase.IsFavoriteUseCase
+import com.fakhri.products.data.utils.handleCollect
+import com.google.android.material.dialog.MaterialAlertDialogBuilder
+import com.google.android.material.snackbar.Snackbar
+import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 import java.text.NumberFormat
 import java.util.Locale
 
+@AndroidEntryPoint
 class DetailFragment : Fragment() {
 
     private var _binding: FragmentDetailBinding? = null
     private val binding get() = _binding!!
-    private lateinit var viewModel: DetailFragmentViewModel
+    private val viewModel: DetailFragmentViewModel by viewModels()
     private val args: DetailFragmentArgs by navArgs()
 
     override fun onCreateView(
@@ -48,70 +49,69 @@ class DetailFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        val apiService = ApiConfig.instance
-        val repository = ProductRepository(
-            apiService = apiService,
-            context = requireContext()
-        )
-        val getDetailProductUseCase = GetDetailProductUseCase(repository)
-        val isFavoriteUseCase = IsFavoriteUseCase(repository)
-        val addFavoriteUseCase = AddFavoriteUseCase(repository)
-        val deleteFavoriteUseCase = DeleteFavoriteUseCase(repository)
-        val factory = DetailFragmentViewModelFactory(
-            getDetailProductUseCase,
-            isFavoriteUseCase,
-            addFavoriteUseCase,
-            deleteFavoriteUseCase
-        )
-        viewModel = ViewModelProvider(this, factory).get(DetailFragmentViewModel::class.java)
-
-        binding.btnBack.setOnClickListener {
-            findNavController().navigateUp()
+        val productId = args.productsId
+        val uiAction = {action: DetailAction-> viewModel.processAction(action)}
+        uiAction(DetailAction.FetchProduct(productId))
+        val productFlow = viewModel.state.map { it.product }
+        viewLifecycleOwner.lifecycleScope.launch {
+            productFlow.handleCollect(
+                onSuccess = {
+                    data->
+                    Log.d("DetailFragment", "Data loaded successfully")
+                    binding.pbDetail.visibility = View.GONE
+                    setData(data.data!!)
+                    binding.btnFavorite.setOnClickListener {
+                        viewLifecycleOwner.lifecycleScope.launch {
+                            uiAction(DetailAction.OnClickProduct(data.data.toFavoriteProduct()))
+                        }
+                    }
+                },
+                onLoading = {
+                    Log.d("DetailFragment", "Loading data...")
+                    binding.pbDetail.visibility = View.VISIBLE
+                },
+                onError = {
+                    Log.d("DetailFragment", "Error loading data: ${it.message}")
+                    binding.pbDetail.visibility = View.VISIBLE
+                    MaterialAlertDialogBuilder(requireContext())
+                        .setTitle(getString(R.string.error))
+                        .setMessage(resources.getString(R.string.failed_to_fetch_genres))
+                        .setNeutralButton(resources.getString(R.string.close)) { dialog, which ->
+                            dialog.dismiss()
+                        }
+                        .setPositiveButton(resources.getString(R.string.try_again)) { dialog, which ->
+                            uiAction(DetailAction.FetchProduct(productId))
+                        }
+                        .show()
+                }
+            )
         }
 
-        val productId = args.productsId
-        viewModel.getDetailData(productId)
-        viewModel.checkFavorite(productId)
-        viewModel.isFavorite.observe(viewLifecycleOwner) {
-            if (it) {
-                binding.btnFavorite.setImageResource(R.drawable.ic_filled_favorite)
-            } else {
-                binding.btnFavorite.setImageResource(R.drawable.ic_unfilled_favorite)
+        viewLifecycleOwner.lifecycleScope.launch {
+            viewModel.isFavorite.collect {
+                if (it){
+                    binding.btnFavorite.setImageResource(R.drawable.ic_filled_favorite)
+                }else{
+                    binding.btnFavorite.setImageResource(R.drawable.ic_unfilled_favorite)
+                }
             }
         }
 
         viewLifecycleOwner.lifecycleScope.launch {
-            viewModel.detailData.collect { result ->
-                when (result) {
-                    is Result.Loading -> {
-                        Log.d("DetailFragment", "Loading data...")
-                        binding.pbDetail.visibility = View.VISIBLE
+            viewModel.effect.collect {
+                when(it){
+                    is DetailEffect.ShowMessageBar-> {
+                        Snackbar.make(binding.root,it.message,Snackbar.LENGTH_SHORT).show()
                     }
-
-                    is Result.Success -> {
-                        Log.d("DetailFragment", "Data loaded successfully")
-                        setData(result.data)
-                        binding.pbDetail.visibility = View.GONE
-                        binding.btnFavorite.setOnClickListener {
-                            try {
-                                viewModel.toggleFavorite(result.data.toFavoriteProduct())
-                                Log.e("AddToFavorite","Product is added")
-                            }catch (e: Exception){
-                                Log.e("AddToFavorite",e.message.toString())
-                            }
-                        }
-                    }
-
-                    is Result.Failure -> {
-                        Log.d("DetailFragment", "Error loading data: ${result.exception.message}")
-                        Toast.makeText(
-                            requireActivity(),
-                            result.exception.message,
-                            Toast.LENGTH_SHORT
-                        ).show()
+                    is DetailEffect.BackButtonEffect->{
+                        findNavController().navigateUp()
                     }
                 }
             }
+        }
+
+        binding.btnBack.setOnClickListener {
+            uiAction(DetailAction.BackButtonPressed)
         }
     }
 

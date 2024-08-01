@@ -1,32 +1,61 @@
 package com.fakhri.products.ui.fragment.profile
 
-import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.fakhri.products.BaseViewModel
 import com.fakhri.products.data.local.db.user.UsersEntity
-import com.fakhri.products.data.network.response.user.Users
-import com.fakhri.products.data.utils.Result
-import com.fakhri.products.domain.IUserRepository
+import com.fakhri.products.data.utils.Resource
 import com.fakhri.products.domain.usecase.GetUserUseCase
+import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.onEach
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import javax.inject.Inject
 
-class FragmentProfileViewModel(
+@HiltViewModel
+class FragmentProfileViewModel @Inject constructor(
     private val getUserUseCase: GetUserUseCase
-): ViewModel() {
-    private var _dataUser = MutableStateFlow<Result<UsersEntity>>(Result.Loading)
-    val dataUser = _dataUser
+): BaseViewModel<ProfileState,ProfileAction,ProfileEffect>() {
 
-    fun getUser(id: Int){
+    override val _state =  MutableStateFlow(ProfileState())
+
+    init {
+        actionStateFlow.updateStates().launchIn(viewModelScope)
+    }
+
+    override fun MutableSharedFlow<ProfileAction>.updateStates() = onEach {
+        when(it){
+            is ProfileAction.FetchUser -> showUser(it.id)
+            is ProfileAction.ButtonEditProfilePress-> processEffect(ProfileEffect.NavigateToEditProfile(it.userId))
+        }
+    }
+
+    private fun showUser(id: Int){
         viewModelScope.launch(Dispatchers.IO) {
-            _dataUser.value = Result.Loading
-            try {
-                getUserUseCase(id).collect {
-                    _dataUser.value = it
+            getUserUseCase(id).collect{
+                _state.update {
+                    state->
+                    state.copy(
+                        user = it
+                    )
                 }
-            }catch (e: Exception){
-                _dataUser.value = Result.Failure(e)
             }
         }
     }
+}
+
+sealed class ProfileAction{
+    data class FetchUser(val id: Int) : ProfileAction()
+    data class ButtonEditProfilePress(val userId: Int): ProfileAction()
+}
+
+data class ProfileState(
+    val user: Resource<UsersEntity> = Resource.Idle()
+)
+
+sealed class ProfileEffect{
+    data class NavigateToEditProfile(val userId: Int): ProfileEffect()
 }

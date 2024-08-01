@@ -5,25 +5,28 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.Toast
 import androidx.fragment.app.Fragment
-import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.ViewModelProvider
+import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import androidx.paging.LoadState
-import com.fakhri.products.data.utils.Result
+import androidx.paging.PagingData
+import com.fakhri.products.data.local.db.product.FavoriteProductEntity
 import com.fakhri.products.databinding.FragmentFavoriteBinding
-import com.fakhri.products.data.network.api.ApiConfig
-import com.fakhri.products.data.repository.ProductRepository
-import com.fakhri.products.domain.usecase.GetAllFavoriteUseCase
+import com.fakhri.products.data.utils.handleCollect
+import com.google.android.material.dialog.MaterialAlertDialogBuilder
+import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 
+@AndroidEntryPoint
 class FragmentFavorite : Fragment() {
 
     private var _binding: FragmentFavoriteBinding? = null
     private val binding get() = _binding!!
-    private lateinit var viewModel: FragmentFavoriteViewModel
+    private val viewModel: FragmentFavoriteViewModel by viewModels()
     private lateinit var adapter: FavoriteAdapter
 
     override fun onCreateView(
@@ -31,60 +34,105 @@ class FragmentFavorite : Fragment() {
         savedInstanceState: Bundle?
     ): View {
         _binding = FragmentFavoriteBinding.inflate(inflater,container,false)
-        return binding.root
-    }
-
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        super.onViewCreated(view, savedInstanceState)
-        val repository = ProductRepository(ApiConfig.instance,requireContext())
-        val getAllFavoriteUseCase = GetAllFavoriteUseCase(repository)
-        val factory = FragmentFavoriteViewModelFactory(getAllFavoriteUseCase)
-        viewModel = ViewModelProvider(this, factory).get(FragmentFavoriteViewModel::class.java)
-        setUpRecycler()
-    }
-
-    private fun setUpRecycler() {
-        adapter = FavoriteAdapter{
-            val action = FragmentFavoriteDirections.actionFragmentFavoriteToDetailFragment(it)
-            findNavController().navigate(action)
-        }
-
-        binding.rvFavorite.adapter = adapter
-
-        val loadingState = MutableLiveData<Boolean>()
-
-        adapter.addLoadStateListener { loadState ->
-            loadingState.value = loadState.refresh is LoadState.Loading || loadState.append is LoadState.Loading
-        }
-
-        loadingState.observe(viewLifecycleOwner) { isLoading ->
-            binding.pbFavorite.visibility = if (isLoading) View.VISIBLE else View.GONE
+        val action = {action: FavoriteListUIAction-> viewModel.processAction(action)}
+        val favoriteFlow = viewModel.state.map { it.favorites }
+        action(FavoriteListUIAction.FetchFavoriteList)
+        viewLifecycleOwner.lifecycleScope.launch {
+            favoriteFlow.handleCollect(
+                onSuccess = {
+                    Log.d("FavoriteFragment", "Load Data Success")
+                    binding.pbFavorite.visibility = View.GONE
+                    setUpRecycler(it.data!!, onTryAgain = {
+                        action(FavoriteListUIAction.FetchFavoriteList)
+                    },
+                        onClickProduct = {
+                            id->
+                            action(FavoriteListUIAction.OnClickProduct(id))
+                        })
+                },
+                onLoading = {
+                    Log.d("FavoriteFragment", "Loading data...")
+                    binding.pbFavorite.visibility = View.VISIBLE
+                },
+                onError = {
+                    binding.pbFavorite.visibility = View.GONE
+                    Log.e("FavoriteFragment", "Error: ${it.message}")
+                    MaterialAlertDialogBuilder(requireContext())
+                        .setTitle("Error")
+                        .setMessage("Failed to fetch Products")
+                        .setNeutralButton("Close") { dialog, _ ->
+                            dialog.dismiss()
+                        }
+                        .setPositiveButton("Try Again") { _, _ ->
+                            action(FavoriteListUIAction.FetchFavoriteList)
+                        }
+                        .show()
+                }
+            )
         }
 
         viewLifecycleOwner.lifecycleScope.launch {
-            viewModel.data.collect {
-                    result->
-                when(result){
-                    is Result.Loading ->{
-                        Log.d("FragmenFavorite", "Loading data...")
-                        binding.pbFavorite.visibility = View.VISIBLE
+            viewModel.effect.collect{
+                when(it){
+                    is FavoriteListUIEffect.NavigateToDetail->{
+                        val move = FragmentFavoriteDirections.actionFragmentFavoriteToDetailFragment(it.id)
+                        findNavController().navigate(move)
                     }
-                    is Result.Success ->{
-                        Log.d("HomeFragment", "Data received ${result.data}")
-                        binding.pbFavorite.visibility = View.GONE
-                        adapter.submitData(result.data)
-                    }
-                    is Result.Failure ->{
-                        Log.d("HomeFragment", "Error loading data: ${result.exception.message}")
-                        binding.pbFavorite.visibility = View.GONE
-                        Toast.makeText(requireActivity(),result.exception.message, Toast.LENGTH_SHORT).show()
+                    is FavoriteListUIEffect.BackButtonEffect->{
+                        findNavController().navigateUp()
                     }
                 }
             }
         }
+
         binding.btnBack.setOnClickListener {
-            findNavController().navigateUp()
+            action(FavoriteListUIAction.BackButtonPress)
         }
+
+        return binding.root
+    }
+
+    private fun setUpRecycler(favorites: PagingData<FavoriteProductEntity>,onTryAgain:()-> Unit,onClickProduct:(Int)->Unit) {
+        adapter = FavoriteAdapter{
+            onClickProduct(it)
+        }
+
+        binding.rvFavorite.adapter = adapter
+
+        val loadingState = MutableStateFlow(false)
+
+        adapter.addLoadStateListener { loadState ->
+            loadingState.value = loadState.refresh is LoadState.Loading || loadState.append is LoadState.Loading
+            val errorState = loadState.source.append as? LoadState.Error
+                ?: loadState.source.prepend as? LoadState.Error
+                ?: loadState.append as? LoadState.Error
+                ?: loadState.prepend as? LoadState.Error
+                ?: loadState.refresh as? LoadState.Error
+
+            errorState?.let {
+                MaterialAlertDialogBuilder(requireContext())
+                    .setTitle("Error")
+                    .setMessage("Failed to fetch Products")
+                    .setNeutralButton("Close") { dialog, _ ->
+                        dialog.dismiss()
+                    }
+                    .setPositiveButton("Try Again") { _, _ ->
+                        onTryAgain()
+                    }
+                    .show()
+            }
+        }
+
+        viewLifecycleOwner.lifecycleScope.launch {
+            loadingState.collectLatest {
+                binding.pbFavorite.visibility = if (it) View.VISIBLE else View.GONE
+            }
+        }
+
+        viewLifecycleOwner.lifecycleScope.launch {
+            adapter.submitData(favorites)
+        }
+
     }
 
     override fun onDestroyView() {

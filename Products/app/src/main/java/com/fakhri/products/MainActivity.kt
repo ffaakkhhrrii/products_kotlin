@@ -11,7 +11,9 @@ import com.fakhri.products.databinding.ActivityMainBinding
 import com.fakhri.products.ui.fragment.intent.FragmentIntent
 import com.fakhri.products.ui.fragment.home.HomeFragment
 import com.fakhri.products.ui.fragment.profile.FragmentProfile
+import dagger.hilt.android.AndroidEntryPoint
 
+@AndroidEntryPoint
 class MainActivity : AppCompatActivity() {
 
     private lateinit var navController: NavController

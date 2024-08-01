@@ -7,8 +7,11 @@ import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
 import retrofit2.Retrofit
 import retrofit2.converter.moshi.MoshiConverterFactory
+import javax.inject.Inject
+import javax.inject.Singleton
 
-object ApiConfig {
+@Singleton
+class ApiConfig @Inject constructor() {
     private val moshi = Moshi.Builder().addLast(KotlinJsonAdapterFactory()).build()
     private val loggingInterceptor = HttpLoggingInterceptor().apply {
         level = HttpLoggingInterceptor.Level.BODY
@@ -17,7 +20,7 @@ object ApiConfig {
     private val okHttpClient = OkHttpClient.Builder()
         .addInterceptor(loggingInterceptor)
         .build()
-    val instance : ProductService by lazy {
+    val instance: ProductService by lazy {
         val retrofit = Retrofit.Builder()
             .baseUrl(BuildConfig.BASE_URL)
             .addConverterFactory(MoshiConverterFactory.create(moshi))

@@ -1,11 +1,16 @@
 package com.fakhri.products.data.local.user
 
+import com.fakhri.products.data.local.db.AppDatabase
 import com.fakhri.products.data.local.db.user.UserDAO
 import com.fakhri.products.data.local.db.user.UsersEntity
 import com.fakhri.products.data.network.response.user.Users
+import javax.inject.Inject
+import javax.inject.Singleton
 
-class UserLocalDataSourceImpl(private val userDao: UserDAO) :UserLocalDataSource {
-
+class UserLocalDataSourceImpl @Inject constructor(
+    private val database: AppDatabase
+) :UserLocalDataSource {
+    private val userDao = database.userDao()
     override fun getUser(id: Int): UsersEntity {
         return userDao.getUser(id)
     }

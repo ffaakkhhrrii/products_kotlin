@@ -4,10 +4,9 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.Toast
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
-import androidx.lifecycle.ViewModelProvider
+import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import com.bumptech.glide.Glide
@@ -15,19 +14,21 @@ import com.bumptech.glide.load.resource.bitmap.CenterCrop
 import com.bumptech.glide.load.resource.bitmap.RoundedCorners
 import com.fakhri.products.R
 import com.fakhri.products.data.local.db.user.UsersEntity
-import com.fakhri.products.data.network.response.user.Users
-import com.fakhri.products.data.utils.Result
 import com.fakhri.products.databinding.FragmentProfileBinding
-import com.fakhri.products.data.network.api.ApiConfig
-import com.fakhri.products.data.repository.UserRepository
-import com.fakhri.products.domain.usecase.GetUserUseCase
+import com.fakhri.products.data.utils.handleCollect
+import com.google.android.material.dialog.MaterialAlertDialogBuilder
+import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.flow.collect
+import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 
+@AndroidEntryPoint
 class FragmentProfile : Fragment() {
 
     private var _binding: FragmentProfileBinding? = null
     private val binding get() = _binding!!
-    private lateinit var viewModel: FragmentProfileViewModel
+    private val viewModel: FragmentProfileViewModel by viewModels()
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -40,36 +41,49 @@ class FragmentProfile : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        val repository = UserRepository(ApiConfig.instance,requireContext())
-        val getUserUseCase = GetUserUseCase(repository)
-        val factory = FragmentProfileViewModelFactory(getUserUseCase)
-        viewModel = ViewModelProvider(this,factory).get(FragmentProfileViewModel::class.java)
-
         val id = 2
-        viewModel.getUser(id)
+        val action = {action: ProfileAction -> viewModel.processAction(action)}
+        action(ProfileAction.FetchUser(id))
+        val userFlow = viewModel.state.map { it.user }.distinctUntilChanged()
         viewLifecycleOwner.lifecycleScope.launch {
-            viewModel.dataUser.collect{
-                result->
-                when(result){
-                    is Result.Loading ->{
-                        binding.pbUser.visibility = View.VISIBLE
-                        binding.layoutUser.isVisible = false
-                    }
-                    is Result.Success->{
-                        setDataUser(result.data)
-                        binding.layoutUser.isVisible = true
-                        binding.pbUser.visibility = View.GONE
-                    }
-                    is Result.Failure->{
-                        Toast.makeText(requireContext(),result.exception.message,Toast.LENGTH_SHORT).show()
+            userFlow.handleCollect(
+                onSuccess = {
+                    setDataUser(it.data!!)
+                    binding.layoutUser.isVisible = true
+                    binding.pbUser.visibility = View.GONE
+                },
+                onLoading = {
+                    binding.pbUser.visibility = View.VISIBLE
+                    binding.layoutUser.isVisible = false
+                },
+                onError = {
+                    MaterialAlertDialogBuilder(requireContext())
+                        .setTitle(getString(R.string.error))
+                        .setMessage(resources.getString(R.string.failed_to_fetch_genres))
+                        .setNeutralButton(resources.getString(R.string.close)) { dialog, which ->
+                            dialog.dismiss()
+                        }
+                        .setPositiveButton(resources.getString(R.string.try_again)) { dialog, which ->
+                            action(ProfileAction.FetchUser(id))
+                        }
+                        .show()
+                }
+            )
+        }
+
+        viewLifecycleOwner.lifecycleScope.launch {
+            viewModel.effect.collect{
+                when(it){
+                    is ProfileEffect.NavigateToEditProfile->{
+                        val move = FragmentProfileDirections.actionFragmentProfileToFragmentEditProfile(it.userId)
+                        findNavController().navigate(move)
                     }
                 }
             }
         }
 
         binding.btnEditProfile.setOnClickListener {
-            val action = FragmentProfileDirections.actionFragmentProfileToFragmentEditProfile(id)
-            findNavController().navigate(action)
+            action(ProfileAction.ButtonEditProfilePress(id))
         }
     }
 

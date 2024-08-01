@@ -5,89 +5,139 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.Toast
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.viewModels
 import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import androidx.paging.LoadState
-import com.fakhri.products.data.repository.ProductRepository
+import androidx.paging.PagingData
+import androidx.paging.map
 import com.fakhri.products.data.network.paging.ProductPagingAdapter
-import com.fakhri.products.data.utils.Result
+import com.fakhri.products.data.network.response.all.Product
+import com.fakhri.products.data.utils.handleCollect
 import com.fakhri.products.databinding.FragmentHomeBinding
-import com.fakhri.products.data.network.api.ApiConfig
-import com.fakhri.products.domain.usecase.GetProductsUseCase
+import com.google.android.material.dialog.MaterialAlertDialogBuilder
+import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 
+@AndroidEntryPoint
 class HomeFragment : Fragment() {
 
     private var _binding: FragmentHomeBinding? = null
     private val binding get() = _binding!!
-    private lateinit var viewModel: HomeFragmentViewModel
+    private val viewModel: HomeFragmentViewModel by viewModels()
     private lateinit var adapter: ProductPagingAdapter
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
-        // Inflate the layout for this fragment
         _binding = FragmentHomeBinding.inflate(inflater, container, false)
-        return binding.root
-    }
 
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        super.onViewCreated(view, savedInstanceState)
-        val repository = ProductRepository(ApiConfig.instance,requireContext())
-        val getProductsUseCase = GetProductsUseCase(repository)
-        val factory = HomeFragmentViewModelFactory(getProductsUseCase)
-        viewModel = ViewModelProvider(this, factory).get(HomeFragmentViewModel::class.java)
-        setUpRecycler()
-    }
-
-    private fun setUpRecycler() {
-        adapter = ProductPagingAdapter{
-            val action = HomeFragmentDirections.actionHomeFragmentToDetailFragment(it)
-            findNavController().navigate(action)
-        }
-
-        binding.rvProducts.adapter = adapter
-
-        val loadingState = MutableLiveData<Boolean>()
-
-        adapter.addLoadStateListener { loadState ->
-            loadingState.value = loadState.refresh is LoadState.Loading || loadState.append is LoadState.Loading
-        }
-
-        loadingState.observe(viewLifecycleOwner) { isLoading ->
-            binding.progressBar.visibility = if (isLoading) View.VISIBLE else View.GONE
+        val uiState = viewModel.state
+        val uiAction = { action: HomeAction -> viewModel.processAction(action) }
+        val productFlow = uiState.map { it.products }.distinctUntilChanged()
+        viewLifecycleOwner.lifecycleScope.launch {
+            productFlow.handleCollect(
+                onSuccess = {result ->
+                    binding.progressBar.visibility = View.GONE
+                    setUpRecycler(result.data!!,
+                        onTryAgain = {
+                            uiAction(HomeAction.FetchProducts)
+                        },
+                        onClickProduct = {
+                            uiAction(HomeAction.OnClickProduct(it))
+                        })
+                    Log.i("HomeFragment", "Load Data Success")
+                },
+                onLoading = {
+                    binding.progressBar.visibility = View.VISIBLE
+                    Log.i("HomeFragment", "Loading data")
+                },
+                onError = { resource ->
+                    binding.progressBar.visibility = View.GONE
+                    Log.e("HomeFragment", "Error: ${resource}")
+                    MaterialAlertDialogBuilder(requireContext())
+                        .setTitle("Error")
+                        .setMessage(resource.message ?: "Failed to fetch Products")
+                        .setNeutralButton("Close") { dialog, _ ->
+                            dialog.dismiss()
+                        }
+                        .setPositiveButton("Try Again") { _, _ ->
+                            uiAction(HomeAction.FetchProducts)
+                        }
+                        .show()
+                },
+            )
         }
 
         viewLifecycleOwner.lifecycleScope.launch {
-            viewModel.data.collectLatest {
-                result->
-                when(result){
-                    is Result.Loading ->{
-                        Log.d("HomeFragment", "Loading data...")
-                        binding.progressBar.visibility = View.VISIBLE
+            viewModel.effect.collect {
+                when(it){
+                    is HomeEffect.NavigateToDetail->{
+                        val action = HomeFragmentDirections.actionHomeFragmentToDetailFragment(it.id)
+                        findNavController().navigate(action)
                     }
-                    is Result.Success ->{
-                        Log.d("HomeFragment", "Data received ${result.data}")
-                        binding.progressBar.visibility = View.GONE
-                        adapter.submitData(result.data)
-                    }
-                    is Result.Failure ->{
-                        Log.d("HomeFragment", "Error loading data: ${result.exception.message}")
-                        binding.progressBar.visibility = View.GONE
-                        Toast.makeText(requireActivity(),result.exception.message,Toast.LENGTH_SHORT).show()
+                    is HomeEffect.NavigateToFavorite->{
+                        val action = HomeFragmentDirections.actionHomeFragmentToFragmentFavorite()
+                        findNavController().navigate(action)
                     }
                 }
             }
         }
+
         binding.btnToFavorite.setOnClickListener {
-            val action = HomeFragmentDirections.actionHomeFragmentToFragmentFavorite()
-            findNavController().navigate(action)
+            uiAction(HomeAction.OnClickButtonFavorite)
+        }
+
+        return binding.root
+    }
+
+    private fun setUpRecycler(product: PagingData<Product>,onTryAgain:()-> Unit,onClickProduct:(Int)-> Unit) {
+        adapter = ProductPagingAdapter {
+            onClickProduct(it)
+        }
+
+        binding.rvProducts.adapter = adapter
+
+        val loadingState = MutableStateFlow(false)
+
+        adapter.addLoadStateListener { loadState ->
+            loadingState.value = loadState.refresh is LoadState.Loading || loadState.append is LoadState.Loading
+            val errorState = loadState.source.append as? LoadState.Error
+                ?: loadState.source.prepend as? LoadState.Error
+                ?: loadState.append as? LoadState.Error
+                ?: loadState.prepend as? LoadState.Error
+                ?: loadState.refresh as? LoadState.Error
+
+            errorState?.let {
+                MaterialAlertDialogBuilder(requireContext())
+                    .setTitle("Error")
+                    .setMessage("Failed to fetch Products")
+                    .setNeutralButton("Close") { dialog, _ ->
+                        dialog.dismiss()
+                    }
+                    .setPositiveButton("Try Again") { _, _ ->
+                        onTryAgain()
+                    }
+                    .show()
+            }
+        }
+
+        viewLifecycleOwner.lifecycleScope.launch {
+            loadingState.collectLatest { isLoading ->
+                binding.progressBar.visibility = if (isLoading) View.VISIBLE else View.GONE
+            }
+
+        }
+
+        viewLifecycleOwner.lifecycleScope.launch {
+            adapter.submitData(product)
         }
     }
 

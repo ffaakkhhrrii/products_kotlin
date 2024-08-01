@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="error">Error</string>
+    <string name="failed_to_fetch_genres">Failed to fetch data</string>
+    <string name="close">Close</string>
+    <string name="try_again">Try Again</string>
+</resources>

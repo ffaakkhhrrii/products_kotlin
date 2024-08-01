@@ -3,11 +3,16 @@ package com.fakhri.products.data.network.product
 import com.fakhri.products.data.network.response.detail.DetailProduct
 import com.fakhri.products.data.network.api.ProductService
 import retrofit2.Response
+import javax.inject.Inject
 
-class DetailProductRemoteDataSourceImpl(
+class ProductRemoteDataSourceImpl @Inject constructor(
     private val apiService: ProductService
-): DetailProductRemoteDataSource {
+): ProductRemoteDataSource {
     override suspend fun getProduct(id: Int): Response<DetailProduct> {
         return apiService.getProductId(id)
+    }
+
+    override fun getService(): ProductService {
+        return apiService
     }
 }

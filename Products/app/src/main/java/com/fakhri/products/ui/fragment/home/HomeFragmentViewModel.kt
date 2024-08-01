@@ -1,37 +1,67 @@
 package com.fakhri.products.ui.fragment.home
 
-import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.paging.PagingData
-import androidx.paging.cachedIn
+import com.fakhri.products.BaseViewModel
 import com.fakhri.products.data.network.response.all.Product
+import com.fakhri.products.data.utils.Resource
 import kotlinx.coroutines.flow.MutableStateFlow
-import com.fakhri.products.data.utils.Result
 import com.fakhri.products.domain.usecase.GetProductsUseCase
+import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.onEach
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import javax.inject.Inject
 
-class HomeFragmentViewModel(
+@HiltViewModel
+class HomeFragmentViewModel @Inject constructor(
     private val getProductsUseCase: GetProductsUseCase
-) : ViewModel() {
-    private var _data = MutableStateFlow<Result<PagingData<Product>>>(Result.Loading)
-    val data: StateFlow<Result<PagingData<Product>>> = _data
+) : BaseViewModel<HomeState, HomeAction,HomeEffect>() {
+
+    override val _state = MutableStateFlow(HomeState())
 
     init {
-        getData()
+        actionStateFlow.updateStates().launchIn(viewModelScope)
+        processAction(HomeAction.FetchProducts)
     }
 
-    private fun getData() {
+    override fun MutableSharedFlow<HomeAction>.updateStates() = onEach {
+        when (it) {
+            is HomeAction.FetchProducts -> {
+                fetchProducts()
+            }
+            is HomeAction.OnClickProduct -> processEffect(HomeEffect.NavigateToDetail(it.id))
+            is HomeAction.OnClickButtonFavorite-> processEffect(HomeEffect.NavigateToFavorite)
+        }
+    }
+
+    private fun fetchProducts(){
         viewModelScope.launch(Dispatchers.IO) {
-            _data.value = Result.Loading
-            try {
-                getProductsUseCase().cachedIn(viewModelScope).collect {
-                    _data.value = Result.Success(it)
+            getProductsUseCase(viewModelScope).collect{
+                _state.update {state->
+                    state.copy(
+                        products = it
+                    )
                 }
-            } catch (e: Exception) {
-                _data.value = Result.Failure(e)
             }
         }
     }
+}
+
+sealed class HomeAction {
+    object FetchProducts : HomeAction()
+    data class OnClickProduct(val id: Int): HomeAction()
+    object OnClickButtonFavorite: HomeAction()
+}
+
+data class HomeState(
+    val products: Resource<PagingData<Product>> = Resource.Idle()
+)
+
+sealed class HomeEffect{
+    data class NavigateToDetail(val id: Int): HomeEffect()
+    object NavigateToFavorite: HomeEffect()
 }

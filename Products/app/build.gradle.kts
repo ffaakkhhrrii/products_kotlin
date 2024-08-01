@@ -5,6 +5,7 @@ plugins {
     id("org.jetbrains.kotlin.kapt")
     alias(libs.plugins.google.gms.google.services)
     //id ("androidx.room")
+    id("com.google.dagger.hilt.android")
 }
 
 android {
@@ -75,6 +76,9 @@ dependencies {
     implementation("androidx.room:room-ktx:$room_version")
     //implementation("androidx.paging:paging-runtime:$room_version")
     implementation ("androidx.room:room-paging:$room_version")
+
+    implementation("com.google.dagger:hilt-android:2.48")
+    kapt("com.google.dagger:hilt-android-compiler:2.48")
 
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.appcompat)
