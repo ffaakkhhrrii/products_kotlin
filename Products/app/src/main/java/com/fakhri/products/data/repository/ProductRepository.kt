@@ -32,7 +32,7 @@ class ProductRepository @Inject constructor(
         try {
             val pager = Pager(
                 config = PagingConfig(pageSize = 10, enablePlaceholders = false),
-                pagingSourceFactory = { ProductsPagingSource(remoteDataSource.getService()) },
+                pagingSourceFactory = { ProductsPagingSource(remoteDataSource) },
             ).flow.cachedIn(scope)
             pager
                 .map { pagingData -> Resource.Success(pagingData) }

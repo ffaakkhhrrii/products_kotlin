@@ -4,10 +4,10 @@ import androidx.paging.PagingSource
 import androidx.paging.PagingState
 import com.fakhri.products.data.network.response.all.Product
 import com.fakhri.products.data.network.api.ProductService
+import com.fakhri.products.data.network.product.ProductRemoteDataSource
 
-const val page = 10
 class ProductsPagingSource(
-    private val apiService: ProductService
+    private val remoteDataSource: ProductRemoteDataSource
 ) : PagingSource<Int, Product>() {
     override fun getRefreshKey(state: PagingState<Int, Product>): Int? {
         return state.anchorPosition?.let {
@@ -20,7 +20,7 @@ class ProductsPagingSource(
     override suspend fun load(params: LoadParams<Int>): LoadResult<Int, Product> {
         return try {
             val currentPage = params.key ?: 0
-            val response = apiService.getProducts(
+            val response = remoteDataSource.getProducts(
                 skip = currentPage,
                 limit = params.loadSize,
                 select = "title,price,tags,images"

@@ -16,7 +16,6 @@ import com.fakhri.products.databinding.FragmentFavoriteBinding
 import com.fakhri.products.data.utils.handleCollect
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import dagger.hilt.android.AndroidEntryPoint
-import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
@@ -42,13 +41,14 @@ class FragmentFavorite : Fragment() {
                 onSuccess = {
                     Log.d("FavoriteFragment", "Load Data Success")
                     binding.pbFavorite.visibility = View.GONE
-                    setUpRecycler(it.data!!, onTryAgain = {
-                        action(FavoriteListUIAction.FetchFavoriteList)
-                    },
-                        onClickProduct = {
-                            id->
-                            action(FavoriteListUIAction.OnClickProduct(id))
-                        })
+                        setUpRecycler(it.data!!, onTryAgain = {
+                            action(FavoriteListUIAction.FetchFavoriteList)
+                        },
+                            onClickProduct = {
+                                    id->
+                                action(FavoriteListUIAction.OnClickProduct(id))
+                            })
+
                 },
                 onLoading = {
                     Log.d("FavoriteFragment", "Loading data...")
@@ -59,7 +59,7 @@ class FragmentFavorite : Fragment() {
                     Log.e("FavoriteFragment", "Error: ${it.message}")
                     MaterialAlertDialogBuilder(requireContext())
                         .setTitle("Error")
-                        .setMessage("Failed to fetch Products")
+                        .setMessage("Failed to fetch Products ${it.message}")
                         .setNeutralButton("Close") { dialog, _ ->
                             dialog.dismiss()
                         }
@@ -99,20 +99,25 @@ class FragmentFavorite : Fragment() {
 
         binding.rvFavorite.adapter = adapter
 
-        val loadingState = MutableStateFlow(false)
-
         adapter.addLoadStateListener { loadState ->
-            loadingState.value = loadState.refresh is LoadState.Loading || loadState.append is LoadState.Loading
+            viewModel.loadingState.value = loadState.refresh is LoadState.Loading || loadState.append is LoadState.Loading
+            val isEmpty = adapter.itemCount == 0 && loadState.refresh is LoadState.NotLoading && loadState.prepend.endOfPaginationReached
             val errorState = loadState.source.append as? LoadState.Error
                 ?: loadState.source.prepend as? LoadState.Error
                 ?: loadState.append as? LoadState.Error
                 ?: loadState.prepend as? LoadState.Error
                 ?: loadState.refresh as? LoadState.Error
 
+            if (isEmpty){
+                binding.emptyListText.visibility = View.VISIBLE
+            }else{
+                binding.emptyListText.visibility = View.GONE
+            }
+
             errorState?.let {
                 MaterialAlertDialogBuilder(requireContext())
                     .setTitle("Error")
-                    .setMessage("Failed to fetch Products")
+                    .setMessage("Failed to fetch Products ${it.error.message.toString()}")
                     .setNeutralButton("Close") { dialog, _ ->
                         dialog.dismiss()
                     }
@@ -124,7 +129,7 @@ class FragmentFavorite : Fragment() {
         }
 
         viewLifecycleOwner.lifecycleScope.launch {
-            loadingState.collectLatest {
+            viewModel.loadingState.collectLatest {
                 binding.pbFavorite.visibility = if (it) View.VISIBLE else View.GONE
             }
         }

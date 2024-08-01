@@ -7,21 +7,17 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
-import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import androidx.paging.LoadState
 import androidx.paging.PagingData
-import androidx.paging.map
 import com.fakhri.products.data.network.paging.ProductPagingAdapter
 import com.fakhri.products.data.network.response.all.Product
 import com.fakhri.products.data.utils.handleCollect
 import com.fakhri.products.databinding.FragmentHomeBinding
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import dagger.hilt.android.AndroidEntryPoint
-import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.collectLatest
-import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 
@@ -41,7 +37,7 @@ class HomeFragment : Fragment() {
 
         val uiState = viewModel.state
         val uiAction = { action: HomeAction -> viewModel.processAction(action) }
-        val productFlow = uiState.map { it.products }.distinctUntilChanged()
+        val productFlow = uiState.map { it.products }
         viewLifecycleOwner.lifecycleScope.launch {
             productFlow.handleCollect(
                 onSuccess = {result ->
@@ -105,10 +101,8 @@ class HomeFragment : Fragment() {
 
         binding.rvProducts.adapter = adapter
 
-        val loadingState = MutableStateFlow(false)
-
         adapter.addLoadStateListener { loadState ->
-            loadingState.value = loadState.refresh is LoadState.Loading || loadState.append is LoadState.Loading
+            viewModel.loadingState.value = loadState.refresh is LoadState.Loading || loadState.append is LoadState.Loading
             val errorState = loadState.source.append as? LoadState.Error
                 ?: loadState.source.prepend as? LoadState.Error
                 ?: loadState.append as? LoadState.Error
@@ -130,7 +124,7 @@ class HomeFragment : Fragment() {
         }
 
         viewLifecycleOwner.lifecycleScope.launch {
-            loadingState.collectLatest { isLoading ->
+            viewModel.loadingState.collectLatest { isLoading ->
                 binding.progressBar.visibility = if (isLoading) View.VISIBLE else View.GONE
             }
 

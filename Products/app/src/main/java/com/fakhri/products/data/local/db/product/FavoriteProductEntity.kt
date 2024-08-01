@@ -12,15 +12,14 @@ import com.google.gson.annotations.SerializedName
 data class FavoriteProductEntity(
     @PrimaryKey
     val id: Int,
-    @ColumnInfo(name = "images", defaultValue = "[]")
+    @ColumnInfo(name = "images")
     @SerializedName("images")
-    val images: ArrayList<String> = arrayListOf(),
-    @ColumnInfo(name = "price", defaultValue = "0.0")
-    val price: Double = 0.0,
-    @ColumnInfo(name = "tags", defaultValue = "[]")
+    val images: ArrayList<String>,
+    @ColumnInfo(name = "price")
+    val price: Double,
+    @ColumnInfo(name = "tags")
     @SerializedName("tags")
-    val tags: ArrayList<String> = arrayListOf(),
-    @ColumnInfo(name = "title", defaultValue = "")
-    val title: String = ""
+    val tags: ArrayList<String>,
+    @ColumnInfo(name = "title")
+    val title: String
 )
-

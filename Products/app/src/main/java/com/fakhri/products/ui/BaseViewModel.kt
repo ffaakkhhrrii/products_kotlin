@@ -1,4 +1,4 @@
-package com.fakhri.products
+package com.fakhri.products.ui
 
 import androidx.lifecycle.ViewModel
 import kotlinx.coroutines.channels.BufferOverflow
@@ -44,5 +44,4 @@ abstract class BaseViewModel<StateType: Any, ActionType: Any, EffectType>: ViewM
      * @return
      */
     protected abstract fun MutableSharedFlow<ActionType>.updateStates(): Flow<ActionType>
-
 }

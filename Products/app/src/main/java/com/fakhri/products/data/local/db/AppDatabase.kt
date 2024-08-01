@@ -14,7 +14,7 @@ import com.fakhri.products.data.utils.ConverterList
 import com.fakhri.products.data.utils.ConverterReview
 
 @Database(
-    exportSchema = true, version = 1, entities = [FavoriteProductEntity::class,UsersEntity::class]
+    exportSchema = true, version = 2, entities = [FavoriteProductEntity::class,UsersEntity::class]
 )
 @TypeConverters(ConverterList::class,ConverterReview::class)
 abstract class AppDatabase : RoomDatabase() {

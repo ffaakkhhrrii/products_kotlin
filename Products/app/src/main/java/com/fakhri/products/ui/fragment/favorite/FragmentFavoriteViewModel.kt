@@ -2,11 +2,10 @@ package com.fakhri.products.ui.fragment.favorite
 
 import androidx.lifecycle.viewModelScope
 import androidx.paging.PagingData
-import com.fakhri.products.BaseViewModel
+import com.fakhri.products.ui.BaseViewModel
 import com.fakhri.products.data.local.db.product.FavoriteProductEntity
 import com.fakhri.products.data.utils.Resource
 import com.fakhri.products.domain.usecase.GetAllFavoriteUseCase
-import com.fakhri.products.ui.fragment.detail.DetailEffect
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableSharedFlow
@@ -20,7 +19,9 @@ import javax.inject.Inject
 @HiltViewModel
 class FragmentFavoriteViewModel @Inject constructor(
     private val getAllFavoriteUseCase: GetAllFavoriteUseCase
-): BaseViewModel<FavoriteListUIState,FavoriteListUIAction,FavoriteListUIEffect>() {
+): BaseViewModel<FavoriteListUIState, FavoriteListUIAction, FavoriteListUIEffect>() {
+
+    val loadingState = MutableStateFlow(false)
 
     override val _state = MutableStateFlow(FavoriteListUIState())
 
@@ -42,7 +43,7 @@ class FragmentFavoriteViewModel @Inject constructor(
                 _state.update {
                     state->
                     state.copy(
-                        favorites = it
+                        favorites = it,
                     )
                 }
             }

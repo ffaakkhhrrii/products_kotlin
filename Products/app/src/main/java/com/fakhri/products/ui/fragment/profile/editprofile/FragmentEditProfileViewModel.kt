@@ -1,7 +1,7 @@
 package com.fakhri.products.ui.fragment.profile.editprofile
 
 import androidx.lifecycle.viewModelScope
-import com.fakhri.products.BaseViewModel
+import com.fakhri.products.ui.BaseViewModel
 import com.fakhri.products.data.local.db.user.UsersEntity
 import com.fakhri.products.data.utils.Resource
 import com.fakhri.products.domain.usecase.ChangeUserUseCase
@@ -22,7 +22,7 @@ class FragmentEditProfileViewModel @Inject constructor(
     private val getUserFromDBUseCase: GetUserFromDBUseCase,
     private val changeUserUseCase: ChangeUserUseCase,
     private val resetUserUseCase: ResetUserUseCase
-): BaseViewModel<EditProfileUIState,EditProfileUIAction,EditProfileUIEffect>() {
+): BaseViewModel<EditProfileUIState, EditProfileUIAction, EditProfileUIEffect>() {
 
     override val _state = MutableStateFlow(EditProfileUIState())
 

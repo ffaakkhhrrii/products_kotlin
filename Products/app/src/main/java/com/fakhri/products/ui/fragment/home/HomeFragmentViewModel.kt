@@ -2,7 +2,7 @@ package com.fakhri.products.ui.fragment.home
 
 import androidx.lifecycle.viewModelScope
 import androidx.paging.PagingData
-import com.fakhri.products.BaseViewModel
+import com.fakhri.products.ui.BaseViewModel
 import com.fakhri.products.data.network.response.all.Product
 import com.fakhri.products.data.utils.Resource
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -21,6 +21,7 @@ class HomeFragmentViewModel @Inject constructor(
     private val getProductsUseCase: GetProductsUseCase
 ) : BaseViewModel<HomeState, HomeAction,HomeEffect>() {
 
+    val loadingState = MutableStateFlow(false)
     override val _state = MutableStateFlow(HomeState())
 
     init {

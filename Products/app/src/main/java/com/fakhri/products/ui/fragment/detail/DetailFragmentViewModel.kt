@@ -1,10 +1,7 @@
 package com.fakhri.products.ui.fragment.detail
 
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.fakhri.products.BaseViewModel
+import com.fakhri.products.ui.BaseViewModel
 import com.fakhri.products.data.local.db.product.FavoriteProductEntity
 import com.fakhri.products.data.network.response.detail.DetailProduct
 import com.fakhri.products.data.utils.Resource
@@ -14,7 +11,6 @@ import com.fakhri.products.domain.usecase.GetDetailProductUseCase
 import com.fakhri.products.domain.usecase.IsFavoriteUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -30,7 +26,7 @@ class DetailFragmentViewModel @Inject constructor(
     private val isFavoriteUseCase: IsFavoriteUseCase,
     private val addFavoriteUseCase: AddFavoriteUseCase,
     private val deleteFavoriteUseCase: DeleteFavoriteUseCase
-) : BaseViewModel<DetailState,DetailAction,DetailEffect>() {
+) : BaseViewModel<DetailState, DetailAction, DetailEffect>() {
 
     override val _state =  MutableStateFlow(DetailState())
     private var _isFavorite = MutableStateFlow(false)

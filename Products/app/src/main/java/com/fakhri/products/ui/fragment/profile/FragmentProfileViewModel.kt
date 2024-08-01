@@ -1,7 +1,7 @@
 package com.fakhri.products.ui.fragment.profile
 
 import androidx.lifecycle.viewModelScope
-import com.fakhri.products.BaseViewModel
+import com.fakhri.products.ui.BaseViewModel
 import com.fakhri.products.data.local.db.user.UsersEntity
 import com.fakhri.products.data.utils.Resource
 import com.fakhri.products.domain.usecase.GetUserUseCase
@@ -18,7 +18,7 @@ import javax.inject.Inject
 @HiltViewModel
 class FragmentProfileViewModel @Inject constructor(
     private val getUserUseCase: GetUserUseCase
-): BaseViewModel<ProfileState,ProfileAction,ProfileEffect>() {
+): BaseViewModel<ProfileState, ProfileAction, ProfileEffect>() {
 
     override val _state =  MutableStateFlow(ProfileState())
 
