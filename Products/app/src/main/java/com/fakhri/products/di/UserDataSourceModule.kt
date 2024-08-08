@@ -1,6 +1,7 @@
 package com.fakhri.products.di
 
 import com.fakhri.products.data.local.db.AppDatabase
+import com.fakhri.products.data.local.db.user.UserDAO
 import com.fakhri.products.data.local.user.UserLocalDataSource
 import com.fakhri.products.data.local.user.UserLocalDataSourceImpl
 import com.fakhri.products.data.network.api.ProductService
@@ -18,9 +19,9 @@ class UserDataSourceModule {
 
     @Provides
     @Singleton
-    fun userLocalDataSource(appDatabase: AppDatabase): UserLocalDataSource{
+    fun userLocalDataSource(dao: UserDAO): UserLocalDataSource{
         return UserLocalDataSourceImpl(
-            appDatabase
+            dao
         )
     }
 

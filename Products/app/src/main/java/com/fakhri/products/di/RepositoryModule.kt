@@ -2,7 +2,6 @@ package com.fakhri.products.di
 
 import com.fakhri.products.data.local.product.ProductLocalDataSource
 import com.fakhri.products.data.local.user.UserLocalDataSource
-import com.fakhri.products.data.network.api.ProductService
 import com.fakhri.products.data.network.product.ProductRemoteDataSource
 import com.fakhri.products.data.network.user.UserRemoteDataSource
 import com.fakhri.products.data.repository.ProductRepository

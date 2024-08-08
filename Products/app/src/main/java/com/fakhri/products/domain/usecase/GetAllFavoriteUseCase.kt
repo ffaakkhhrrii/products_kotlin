@@ -12,7 +12,7 @@ import javax.inject.Inject
 class GetAllFavoriteUseCase @Inject constructor(
     private val repository: IProductRepository
 ) {
-    operator fun invoke(scope: CoroutineScope): Flow<Resource<PagingData<FavoriteProductEntity>>>{
-        return repository.getAllFavorite(scope)
+    operator fun invoke(): Flow<PagingData<FavoriteProductEntity>>{
+        return repository.getAllFavorite()
     }
 }

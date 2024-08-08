@@ -10,11 +10,15 @@ import com.fakhri.products.data.utils.Resource
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
 import com.fakhri.products.domain.IUserRepository
+import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.flowOn
 import javax.inject.Inject
 
 class UserRepository @Inject constructor(
     private val localDataSource: UserLocalDataSource,
-    private val remoteDataSource: UserRemoteDataSource
+    private val remoteDataSource: UserRemoteDataSource,
+    private val dispatcher: CoroutineDispatcher = Dispatchers.IO
 ) : IUserRepository {
     override fun getUser(id: Int): Flow<Resource<UsersEntity>> {
         return flow {
@@ -22,17 +26,35 @@ class UserRepository @Inject constructor(
             try {
                 emit(Resource.Success(getData(id)))
             } catch (e: Exception) {
-                emit(Resource.Error(e.message.toString()))
+                emit(Resource.Error(e.localizedMessage?: "Unknown Error"))
             }
-        }
+        }.flowOn(dispatcher)
     }
 
-    override suspend fun addUser(users: UsersEntity) {
-        localDataSource.addUser(users)
+    override suspend fun addUser(users: UsersEntity): Flow<Resource<UsersEntity>> {
+        return flow {
+            emit(Resource.Loading())
+            try {
+                localDataSource.addUser(users)
+                emit(Resource.Success(users))
+            }catch (e: Exception){
+                Log.e("ChangeUser",e.message.toString())
+                emit(Resource.Error(e.localizedMessage?: "Unknown Error"))
+            }
+        }.flowOn(dispatcher)
     }
 
-    override suspend fun resetUser(id: Int) {
-        localDataSource.deleteUser(id)
+    override suspend fun resetUser(id: Int): Flow<Resource<Unit>> {
+        return flow {
+            emit(Resource.Loading())
+            try {
+                localDataSource.deleteUser(id)
+                emit(Resource.Success(Unit))
+            }catch (e: Exception){
+                Log.e("ResetUser",e.message.toString())
+                emit(Resource.Error(e.localizedMessage?: "Unknown Error"))
+            }
+        }.flowOn(dispatcher)
     }
 
     override fun getUserFromDB(id: Int): Flow<Resource<UsersEntity>> {
@@ -42,9 +64,9 @@ class UserRepository @Inject constructor(
                 emit(Resource.Success(localDataSource.getUser(id)))
             } catch (e: Exception) {
                 Log.i("DBProducts", e.message.toString())
-                emit(Resource.Error(e.message.toString()))
+                emit(Resource.Error(e.localizedMessage?: "Unknown Error"))
             }
-        }
+        }.flowOn(dispatcher)
     }
 
     private suspend fun getData(id: Int): UsersEntity {

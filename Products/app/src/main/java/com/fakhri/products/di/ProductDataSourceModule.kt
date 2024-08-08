@@ -1,6 +1,7 @@
 package com.fakhri.products.di
 
 import com.fakhri.products.data.local.db.AppDatabase
+import com.fakhri.products.data.local.db.product.FavoriteProductDAO
 import com.fakhri.products.data.local.product.ProductLocalDataSource
 import com.fakhri.products.data.local.product.ProductLocalDataSourceImpl
 import com.fakhri.products.data.network.api.ProductService
@@ -18,9 +19,9 @@ class ProductDataSourceModule {
 
     @Provides
     @Singleton
-    fun provideProductLocalDataSource(appDatabase: AppDatabase): ProductLocalDataSource{
+    fun provideProductLocalDataSource(dao: FavoriteProductDAO): ProductLocalDataSource{
         return ProductLocalDataSourceImpl(
-            appDatabase
+            dao
         )
     }
 

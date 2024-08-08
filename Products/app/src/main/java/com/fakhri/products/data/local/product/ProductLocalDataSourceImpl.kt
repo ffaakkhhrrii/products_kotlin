@@ -3,13 +3,13 @@ package com.fakhri.products.data.local.product
 
 import androidx.paging.PagingSource
 import com.fakhri.products.data.local.db.AppDatabase
+import com.fakhri.products.data.local.db.product.FavoriteProductDAO
 import com.fakhri.products.data.local.db.product.FavoriteProductEntity
 import javax.inject.Inject
 
 class ProductLocalDataSourceImpl @Inject constructor(
-    private val database: AppDatabase
+    private val dao: FavoriteProductDAO
 ) : ProductLocalDataSource {
-    private val dao = database.productDao()
     override fun getProduct(id: Int): FavoriteProductEntity {
         return dao.getProduct(id)
     }

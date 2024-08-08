@@ -25,7 +25,7 @@ class FragmentFavorite : Fragment() {
 
     private var _binding: FragmentFavoriteBinding? = null
     private val binding get() = _binding!!
-    private val viewModel: FragmentFavoriteViewModel by viewModels()
+    private val viewModel: FavoriteViewModel by viewModels()
     private lateinit var adapter: FavoriteAdapter
 
     override fun onCreateView(
@@ -34,42 +34,6 @@ class FragmentFavorite : Fragment() {
     ): View {
         _binding = FragmentFavoriteBinding.inflate(inflater,container,false)
         val action = {action: FavoriteListUIAction-> viewModel.processAction(action)}
-        val favoriteFlow = viewModel.state.map { it.favorites }
-        action(FavoriteListUIAction.FetchFavoriteList)
-        viewLifecycleOwner.lifecycleScope.launch {
-            favoriteFlow.handleCollect(
-                onSuccess = {
-                    Log.d("FavoriteFragment", "Load Data Success")
-                    binding.pbFavorite.visibility = View.GONE
-                        setUpRecycler(it.data!!, onTryAgain = {
-                            action(FavoriteListUIAction.FetchFavoriteList)
-                        },
-                            onClickProduct = {
-                                    id->
-                                action(FavoriteListUIAction.OnClickProduct(id))
-                            })
-
-                },
-                onLoading = {
-                    Log.d("FavoriteFragment", "Loading data...")
-                    binding.pbFavorite.visibility = View.VISIBLE
-                },
-                onError = {
-                    binding.pbFavorite.visibility = View.GONE
-                    Log.e("FavoriteFragment", "Error: ${it.message}")
-                    MaterialAlertDialogBuilder(requireContext())
-                        .setTitle("Error")
-                        .setMessage("Failed to fetch Products ${it.message}")
-                        .setNeutralButton("Close") { dialog, _ ->
-                            dialog.dismiss()
-                        }
-                        .setPositiveButton("Try Again") { _, _ ->
-                            action(FavoriteListUIAction.FetchFavoriteList)
-                        }
-                        .show()
-                }
-            )
-        }
 
         viewLifecycleOwner.lifecycleScope.launch {
             viewModel.effect.collect{
@@ -87,6 +51,20 @@ class FragmentFavorite : Fragment() {
 
         binding.btnBack.setOnClickListener {
             action(FavoriteListUIAction.BackButtonPress)
+        }
+
+        viewLifecycleOwner.lifecycleScope.launch {
+            viewModel.pagingDataFlow.collect{
+                setUpRecycler(
+                    favorites = it,
+                    onTryAgain = {
+                        action(FavoriteListUIAction.FetchFavoriteList)
+                    },
+                    onClickProduct = {
+                        action(FavoriteListUIAction.OnClickProduct(it))
+                    }
+                )
+            }
         }
 
         return binding.root

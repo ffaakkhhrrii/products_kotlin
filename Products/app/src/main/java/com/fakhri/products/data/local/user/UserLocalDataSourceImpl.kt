@@ -8,9 +8,8 @@ import javax.inject.Inject
 import javax.inject.Singleton
 
 class UserLocalDataSourceImpl @Inject constructor(
-    private val database: AppDatabase
+    private val userDao: UserDAO
 ) :UserLocalDataSource {
-    private val userDao = database.userDao()
     override fun getUser(id: Int): UsersEntity {
         return userDao.getUser(id)
     }

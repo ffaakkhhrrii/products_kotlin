@@ -10,13 +10,12 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.Flow
 
 interface IProductRepository {
-    fun getData(scope: CoroutineScope): Flow<Resource<PagingData<Product>>>
+    fun getData(): Flow<PagingData<Product>>
 
     //suspend fun updateProduct(id: Int): Flow<FavoriteProduct>
-    suspend fun addToFavorite(favoriteProductEntity: FavoriteProductEntity)
+    suspend fun addToFavorite(favoriteProductEntity: FavoriteProductEntity): Flow<Resource<FavoriteProductEntity>>
     suspend fun getProduct(id: Int): Flow<Resource<DetailProduct>>
-    suspend fun unFavoriteProduct(favoriteProductEntity: FavoriteProductEntity)
+    suspend fun unFavoriteProduct(favoriteProductEntity: FavoriteProductEntity): Flow<Resource<FavoriteProductEntity>>
     fun isFavorite(id: Int): Boolean
-
-    fun getAllFavorite(scope: CoroutineScope): Flow<Resource<PagingData<FavoriteProductEntity>>>
+    fun getAllFavorite(): Flow<PagingData<FavoriteProductEntity>>
 }

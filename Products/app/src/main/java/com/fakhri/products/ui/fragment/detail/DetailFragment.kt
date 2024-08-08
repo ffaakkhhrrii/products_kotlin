@@ -5,10 +5,8 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
-import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
@@ -16,7 +14,6 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.resource.bitmap.RoundedCorners
 import com.fakhri.products.R
-import com.fakhri.products.data.repository.ProductRepository
 import com.fakhri.products.data.network.response.detail.DetailProduct
 import com.fakhri.products.data.network.response.detail.Review
 import com.fakhri.products.data.network.response.detail.toFavoriteProduct
@@ -35,7 +32,7 @@ class DetailFragment : Fragment() {
 
     private var _binding: FragmentDetailBinding? = null
     private val binding get() = _binding!!
-    private val viewModel: DetailFragmentViewModel by viewModels()
+    private val viewModel: DetailViewModel by viewModels()
     private val args: DetailFragmentArgs by navArgs()
 
     override fun onCreateView(
@@ -76,10 +73,10 @@ class DetailFragment : Fragment() {
                     MaterialAlertDialogBuilder(requireContext())
                         .setTitle(getString(R.string.error))
                         .setMessage(resources.getString(R.string.failed_to_fetch_genres))
-                        .setNeutralButton(resources.getString(R.string.close)) { dialog, which ->
+                        .setNeutralButton(resources.getString(R.string.close)) { dialog, _ ->
                             dialog.dismiss()
                         }
-                        .setPositiveButton(resources.getString(R.string.try_again)) { dialog, which ->
+                        .setPositiveButton(resources.getString(R.string.try_again)) { _, _ ->
                             uiAction(DetailAction.FetchProduct(productId))
                         }
                         .show()

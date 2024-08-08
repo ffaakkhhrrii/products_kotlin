@@ -10,7 +10,7 @@ import kotlinx.coroutines.flow.Flow
 import javax.inject.Inject
 
 class GetProductsUseCase @Inject constructor(private val repository: IProductRepository) {
-    operator fun invoke(scope: CoroutineScope): Flow<Resource<PagingData<Product>>>{
-        return repository.getData(scope)
+    operator fun invoke(): Flow<PagingData<Product>>{
+        return repository.getData()
     }
 }

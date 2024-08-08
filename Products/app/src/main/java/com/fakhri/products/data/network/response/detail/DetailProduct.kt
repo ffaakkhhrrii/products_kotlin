@@ -1,8 +1,9 @@
 package com.fakhri.products.data.network.response.detail
 
 import com.fakhri.products.data.local.db.product.FavoriteProductEntity
+import kotlinx.serialization.Serializable
 
-
+@Serializable
 data class DetailProduct(
     val id: Int = 0,
     val availabilityStatus: String = "",

@@ -1,7 +1,9 @@
 package com.fakhri.products.data.network.response.detail
 
 import androidx.room.ColumnInfo
+import kotlinx.serialization.Serializable
 
+@Serializable
 data class Review(
     val comment: String = "",
 

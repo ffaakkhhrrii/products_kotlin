@@ -11,6 +11,7 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.update
@@ -18,7 +19,7 @@ import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
-class FragmentEditProfileViewModel @Inject constructor(
+class EditProfileViewModel @Inject constructor(
     private val getUserFromDBUseCase: GetUserFromDBUseCase,
     private val changeUserUseCase: ChangeUserUseCase,
     private val resetUserUseCase: ResetUserUseCase
@@ -43,7 +44,7 @@ class FragmentEditProfileViewModel @Inject constructor(
     }
 
     private fun fetchUser(id: Int){
-        viewModelScope.launch(Dispatchers.IO) {
+        viewModelScope.launch {
             getUserFromDBUseCase(id).collect{
                 _state.update {
                     state->
@@ -56,25 +57,27 @@ class FragmentEditProfileViewModel @Inject constructor(
     }
 
     private fun changeUser(users: UsersEntity){
-        viewModelScope.launch(Dispatchers.IO) {
-            changeUserUseCase(users)
-            _state.update {
-                state->
-                state.copy(
-                    user = state.user
-                )
+        viewModelScope.launch {
+            changeUserUseCase(users).collect{resource->
+                _state.update { state->
+                    state.copy(
+                        user = resource,
+                        change = resource
+                    )
+                }
             }
             processEffect(EditProfileUIEffect.BackToProfile)
         }
     }
     private fun resetUser(id: Int){
-        viewModelScope.launch(Dispatchers.IO) {
-            resetUserUseCase(id)
-            _state.update {
-                state->
-                state.copy(
-                    user = state.user
-                )
+        viewModelScope.launch {
+            resetUserUseCase(id).collect{resource->
+                _state.update {
+                        state->
+                    state.copy(
+                        reset = resource
+                    )
+                }
             }
             processEffect(EditProfileUIEffect.BackToProfile)
         }
@@ -92,7 +95,9 @@ sealed class EditProfileUIAction{
 }
 
 data class EditProfileUIState(
-    val user: Resource<UsersEntity> = Resource.Idle()
+    val user: Resource<UsersEntity> = Resource.Idle(),
+    val change: Resource<UsersEntity> = Resource.Idle(),
+    val reset: Resource<Unit> = Resource.Idle()
 )
 
 sealed class EditProfileUIEffect{

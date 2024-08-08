@@ -5,8 +5,9 @@ import androidx.paging.PagingState
 import com.fakhri.products.data.network.response.all.Product
 import com.fakhri.products.data.network.api.ProductService
 import com.fakhri.products.data.network.product.ProductRemoteDataSource
+import javax.inject.Inject
 
-class ProductsPagingSource(
+class ProductsPagingSource @Inject constructor(
     private val remoteDataSource: ProductRemoteDataSource
 ) : PagingSource<Int, Product>() {
     override fun getRefreshKey(state: PagingState<Int, Product>): Int? {

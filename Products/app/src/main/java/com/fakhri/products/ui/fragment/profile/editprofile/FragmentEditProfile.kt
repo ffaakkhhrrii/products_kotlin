@@ -46,7 +46,7 @@ class FragmentEditProfile : Fragment() {
 
     private var _binding: FragmentEditProfileBinding? = null
     private val binding get() = _binding!!
-    private val viewModel: FragmentEditProfileViewModel by viewModels()
+    private val viewModel: EditProfileViewModel by viewModels()
     private val args: FragmentEditProfileArgs by navArgs()
     private lateinit var selectedDate: String
     private var currentSelectedImage: Uri? = null

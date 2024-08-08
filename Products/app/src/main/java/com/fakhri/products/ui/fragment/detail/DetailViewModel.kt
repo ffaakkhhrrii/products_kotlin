@@ -21,7 +21,7 @@ import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
-class DetailFragmentViewModel @Inject constructor(
+class DetailViewModel @Inject constructor(
     private val getDetailProductUseCase: GetDetailProductUseCase,
     private val isFavoriteUseCase: IsFavoriteUseCase,
     private val addFavoriteUseCase: AddFavoriteUseCase,
@@ -29,7 +29,7 @@ class DetailFragmentViewModel @Inject constructor(
 ) : BaseViewModel<DetailState, DetailAction, DetailEffect>() {
 
     override val _state =  MutableStateFlow(DetailState())
-    private var _isFavorite = MutableStateFlow(false)
+    var _isFavorite = MutableStateFlow(false)
     val isFavorite: StateFlow<Boolean> get() = _isFavorite
 
     private fun checkFavorite(id: Int): Boolean {
@@ -46,48 +46,51 @@ class DetailFragmentViewModel @Inject constructor(
 
     override fun MutableSharedFlow<DetailAction>.updateStates() = onEach {
         when(it){
-            is DetailAction.FetchProduct -> fetchMovie(it.id)
+            is DetailAction.FetchProduct -> fetchDetailProduct(it.id)
             is DetailAction.OnClickProduct -> onClickProduct(it.favoriteProductEntity)
             is DetailAction.BackButtonPressed-> processEffect(DetailEffect.BackButtonEffect)
         }
     }
 
     private fun onClickProduct(favoriteProductEntity: FavoriteProductEntity){
-        viewModelScope.launch(Dispatchers.IO) {
+        viewModelScope.launch {
             if (_isFavorite.value){
-                deleteFavoriteUseCase(favoriteProductEntity)
-                _isFavorite.value = false
-                _state.update {
-                    it.copy(
-                        product = it.product,
-                        isFavorite = it.isFavorite
-                    )
+                deleteFavoriteUseCase(favoriteProductEntity).collect{resource->
+                    _isFavorite.value = false
+                    _state.update {
+                        it.copy(
+                            isFavorite = false,
+                            deleteFavorite = resource
+                        )
+                    }
                 }
                 processEffect(DetailEffect.ShowMessageBar("Product's remove from favorite"))
             }else{
-                addFavoriteUseCase(favoriteProductEntity)
-                _isFavorite.value = true
-                _state.update {
-                    it.copy(
-                        product = it.product,
-                        isFavorite = it.isFavorite
-                    )
+                addFavoriteUseCase(favoriteProductEntity).collect{resource->
+                    _isFavorite.value = true
+                    _state.update {
+                        it.copy(
+                            isFavorite = true,
+                            addFavorite = resource
+                        )
+                    }
                 }
                 processEffect(DetailEffect.ShowMessageBar("Product's added to favorite"))
             }
         }
     }
 
-    private fun fetchMovie(id: Int){
+    private fun fetchDetailProduct(id: Int){
         viewModelScope.launch(Dispatchers.IO) {
             getDetailProductUseCase(id).collect{
                 _state.update {state->
                     state.copy(
                         product = it,
-                       isFavorite = checkFavorite(id)
+                       isFavorite = isFavoriteUseCase(id)
                     )
                 }
             }
+            checkFavorite(id)
         }
     }
 
@@ -95,7 +98,9 @@ class DetailFragmentViewModel @Inject constructor(
 
 data class DetailState(
     val product: Resource<DetailProduct> = Resource.Idle(),
-    val isFavorite: Boolean = false
+    val isFavorite: Boolean = false,
+    val addFavorite: Resource<FavoriteProductEntity> = Resource.Idle(),
+    val deleteFavorite: Resource<FavoriteProductEntity> = Resource.Idle()
 )
 
 sealed class DetailAction{

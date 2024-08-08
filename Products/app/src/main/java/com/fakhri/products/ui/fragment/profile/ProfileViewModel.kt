@@ -16,7 +16,7 @@ import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
-class FragmentProfileViewModel @Inject constructor(
+class ProfileViewModel @Inject constructor(
     private val getUserUseCase: GetUserUseCase
 ): BaseViewModel<ProfileState, ProfileAction, ProfileEffect>() {
 

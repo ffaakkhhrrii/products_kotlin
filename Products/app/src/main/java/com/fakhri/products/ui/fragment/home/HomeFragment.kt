@@ -26,8 +26,9 @@ class HomeFragment : Fragment() {
 
     private var _binding: FragmentHomeBinding? = null
     private val binding get() = _binding!!
-    private val viewModel: HomeFragmentViewModel by viewModels()
+    private val viewModel: HomeViewModel by viewModels()
     private lateinit var adapter: ProductPagingAdapter
+    //val idlingResource = CountingIdlingResource("Paging")
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -35,51 +36,18 @@ class HomeFragment : Fragment() {
     ): View {
         _binding = FragmentHomeBinding.inflate(inflater, container, false)
 
-        val uiState = viewModel.state
         val uiAction = { action: HomeAction -> viewModel.processAction(action) }
-        val productFlow = uiState.map { it.products }
-        viewLifecycleOwner.lifecycleScope.launch {
-            productFlow.handleCollect(
-                onSuccess = {result ->
-                    binding.progressBar.visibility = View.GONE
-                    setUpRecycler(result.data!!,
-                        onTryAgain = {
-                            uiAction(HomeAction.FetchProducts)
-                        },
-                        onClickProduct = {
-                            uiAction(HomeAction.OnClickProduct(it))
-                        })
-                    Log.i("HomeFragment", "Load Data Success")
-                },
-                onLoading = {
-                    binding.progressBar.visibility = View.VISIBLE
-                    Log.i("HomeFragment", "Loading data")
-                },
-                onError = { resource ->
-                    binding.progressBar.visibility = View.GONE
-                    Log.e("HomeFragment", "Error: ${resource}")
-                    MaterialAlertDialogBuilder(requireContext())
-                        .setTitle("Error")
-                        .setMessage(resource.message ?: "Failed to fetch Products")
-                        .setNeutralButton("Close") { dialog, _ ->
-                            dialog.dismiss()
-                        }
-                        .setPositiveButton("Try Again") { _, _ ->
-                            uiAction(HomeAction.FetchProducts)
-                        }
-                        .show()
-                },
-            )
-        }
 
         viewLifecycleOwner.lifecycleScope.launch {
             viewModel.effect.collect {
-                when(it){
-                    is HomeEffect.NavigateToDetail->{
-                        val action = HomeFragmentDirections.actionHomeFragmentToDetailFragment(it.id)
+                when (it) {
+                    is HomeEffect.NavigateToDetail -> {
+                        val action =
+                            HomeFragmentDirections.actionHomeFragmentToDetailFragment(it.id)
                         findNavController().navigate(action)
                     }
-                    is HomeEffect.NavigateToFavorite->{
+
+                    is HomeEffect.NavigateToFavorite -> {
                         val action = HomeFragmentDirections.actionHomeFragmentToFragmentFavorite()
                         findNavController().navigate(action)
                     }
@@ -91,10 +59,26 @@ class HomeFragment : Fragment() {
             uiAction(HomeAction.OnClickButtonFavorite)
         }
 
+        viewLifecycleOwner.lifecycleScope.launch {
+            viewModel.pagingDataFlow.collect {
+                setUpRecycler(it,
+                onTryAgain = {
+                uiAction(HomeAction.FetchProducts)
+                },
+                onClickProduct = {
+                uiAction(HomeAction.OnClickProduct(it))
+                })
+            }
+        }
+
         return binding.root
     }
 
-    private fun setUpRecycler(product: PagingData<Product>,onTryAgain:()-> Unit,onClickProduct:(Int)-> Unit) {
+    private fun setUpRecycler(
+        product: PagingData<Product>,
+        onTryAgain: () -> Unit,
+        onClickProduct: (Int) -> Unit
+    ) {
         adapter = ProductPagingAdapter {
             onClickProduct(it)
         }
@@ -102,13 +86,21 @@ class HomeFragment : Fragment() {
         binding.rvProducts.adapter = adapter
 
         adapter.addLoadStateListener { loadState ->
-            viewModel.loadingState.value = loadState.refresh is LoadState.Loading || loadState.append is LoadState.Loading
+            viewModel.loadingState.value =
+                loadState.refresh is LoadState.Loading || loadState.append is LoadState.Loading
             val errorState = loadState.source.append as? LoadState.Error
                 ?: loadState.source.prepend as? LoadState.Error
                 ?: loadState.append as? LoadState.Error
                 ?: loadState.prepend as? LoadState.Error
                 ?: loadState.refresh as? LoadState.Error
+            val isEmpty =
+                adapter.itemCount == 0 && loadState.refresh is LoadState.NotLoading && loadState.prepend.endOfPaginationReached
 
+            if (isEmpty) {
+                binding.emptyListTextProduct.visibility = View.VISIBLE
+            } else {
+                binding.emptyListTextProduct.visibility = View.GONE
+            }
             errorState?.let {
                 MaterialAlertDialogBuilder(requireContext())
                     .setTitle("Error")

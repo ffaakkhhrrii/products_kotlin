@@ -3,6 +3,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:id="@+id/fragmentHomeRoot"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     tools:context=".ui.fragment.home.HomeFragment"
     android:orientation="vertical">
@@ -17,13 +18,26 @@
         android:clipToPadding="false"
         />
 
-
     <ProgressBar
         android:id="@+id/progress_bar"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_centerInParent="true"
         android:visibility="visible" />
+
+    <TextView
+        android:id="@+id/emptyListTextProduct"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_vertical"
+        android:fontFamily="@font/poppins_semi_bold"
+        android:gravity="center"
+        android:text="Product is empty"
+        android:visibility="gone"
+        android:layout_centerInParent="true"
+        android:textColor="?attr/colorOnSurface"
+        android:textSize="20sp"
+        android:textStyle="bold" />
 
     <com.google.android.material.floatingactionbutton.FloatingActionButton
         android:layout_width="wrap_content"

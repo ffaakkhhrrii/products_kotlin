@@ -5,17 +5,15 @@ import kotlinx.coroutines.channels.BufferOverflow
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
 
 abstract class BaseViewModel<StateType: Any, ActionType: Any, EffectType>: ViewModel() {
 
     protected abstract val _state: MutableStateFlow<StateType>
-    val state: StateFlow<StateType>
-        get() = _state.asStateFlow()
+    open val state get() = _state.asStateFlow()
 
-    open val _effect: MutableSharedFlow<EffectType> = MutableSharedFlow(
+    protected open val _effect: MutableSharedFlow<EffectType> = MutableSharedFlow(
         extraBufferCapacity = 10,
         onBufferOverflow = BufferOverflow.DROP_OLDEST
     )

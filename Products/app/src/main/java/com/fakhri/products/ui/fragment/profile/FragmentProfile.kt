@@ -18,7 +18,6 @@ import com.fakhri.products.databinding.FragmentProfileBinding
 import com.fakhri.products.data.utils.handleCollect
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import dagger.hilt.android.AndroidEntryPoint
-import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
@@ -28,7 +27,7 @@ class FragmentProfile : Fragment() {
 
     private var _binding: FragmentProfileBinding? = null
     private val binding get() = _binding!!
-    private val viewModel: FragmentProfileViewModel by viewModels()
+    private val viewModel: ProfileViewModel by viewModels()
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -44,7 +43,7 @@ class FragmentProfile : Fragment() {
         val id = 2
         val action = {action: ProfileAction -> viewModel.processAction(action)}
         action(ProfileAction.FetchUser(id))
-        val userFlow = viewModel.state.map { it.user }.distinctUntilChanged()
+        val userFlow = viewModel.state.map { it.user }
         viewLifecycleOwner.lifecycleScope.launch {
             userFlow.handleCollect(
                 onSuccess = {
@@ -57,13 +56,16 @@ class FragmentProfile : Fragment() {
                     binding.layoutUser.isVisible = false
                 },
                 onError = {
+                    binding.pbUser.visibility = View.GONE
+                    binding.layoutUser.isVisible = false
+                    binding.btnEditProfile.visibility = View.GONE
                     MaterialAlertDialogBuilder(requireContext())
                         .setTitle(getString(R.string.error))
                         .setMessage(resources.getString(R.string.failed_to_fetch_genres))
-                        .setNeutralButton(resources.getString(R.string.close)) { dialog, which ->
+                        .setNeutralButton(resources.getString(R.string.close)) { dialog, _ ->
                             dialog.dismiss()
                         }
-                        .setPositiveButton(resources.getString(R.string.try_again)) { dialog, which ->
+                        .setPositiveButton(resources.getString(R.string.try_again)) { _, _ ->
                             action(ProfileAction.FetchUser(id))
                         }
                         .show()
