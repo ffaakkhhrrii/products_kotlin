@@ -52,7 +52,7 @@ class HomeViewModelTest{
     }
 
     @Test
-    fun`init paging products return not empty`() = runTest {
+    fun`when init paging products return not empty`() = runTest {
         val product1 = Product(
             1,
             listOf("https://example.com/image1.png"),
@@ -79,7 +79,34 @@ class HomeViewModelTest{
     }
 
     @Test
-    fun `onClickProduct should trigger NavigateToDetail effect`() = runTest {
+    fun`when FetchProducts should return not empty`() = runTest {
+        val product1 = Product(
+            1,
+            listOf("https://example.com/image1.png"),
+            200.0,
+            listOf("Makanan"),
+            "Bakso"
+        )
+
+        val expect = PagingData.from(listOf(product1))
+        `when`(getProductsUseCase()).thenReturn(flowOf(expect))
+
+        val differ = AsyncPagingDataDiffer(
+            diffCallback = ProductPagingAdapter.DIFF_CALLBACK,
+            updateCallback = noopListUpdateCallback,
+            workerDispatcher = Dispatchers.Main
+        )
+
+        viewModel.processAction(HomeAction.FetchProducts)
+
+        viewModel.pagingDataFlow.test {
+            differ.submitData(awaitItem())
+            assertEquals(1,differ.snapshot().size)
+        }
+    }
+
+    @Test
+    fun `when onClickProduct should trigger NavigateToDetail effect`() = runTest {
         val id = 1
         viewModel.effect.test {
             viewModel.processAction(HomeAction.OnClickProduct(id))
@@ -90,7 +117,7 @@ class HomeViewModelTest{
     }
 
     @Test
-    fun `onClickButtonFavorite should trigger NavigateToFavorite`()= runTest {
+    fun `when onClickButtonFavorite should trigger NavigateToFavorite`()= runTest {
         viewModel.effect.test {
             viewModel.processAction(HomeAction.OnClickButtonFavorite)
 

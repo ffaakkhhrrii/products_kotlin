@@ -1,6 +1,7 @@
 package com.fakhri.products.domain.usecase
 
 import com.fakhri.products.data.local.db.product.FavoriteProductEntity
+import com.fakhri.products.data.repository.ProductRepository
 import com.fakhri.products.data.utils.Resource
 import com.fakhri.products.domain.IProductRepository
 import kotlinx.coroutines.Dispatchers
@@ -14,6 +15,9 @@ import org.junit.Before
 import org.junit.Test
 import org.mockito.Mock
 import org.mockito.Mockito
+import org.mockito.Mockito.mock
+import org.mockito.Mockito.verify
+import org.mockito.Mockito.`when`
 import org.mockito.MockitoAnnotations
 
 class AddFavoriteUseCaseTest{
@@ -46,12 +50,13 @@ class AddFavoriteUseCaseTest{
             title = "Product 1"
         )
         val expect = Resource.Success(data)
-        Mockito.`when`(repos.addToFavorite(data)).thenReturn(flowOf(expect))
+        `when`(repos.addToFavorite(data)).thenReturn(flowOf(expect))
 
-        val actual = repos.addToFavorite(data)
+        val actual = addFavoriteUseCase(data)
         actual.collect{
             assert(it is Resource.Success)
         }
+        verify(repos).addToFavorite(data)
     }
 
     @Test
@@ -65,9 +70,9 @@ class AddFavoriteUseCaseTest{
         )
         val exception = Exception("Error")
         val expect = Resource.Error(exception.localizedMessage?: "Unknown Error",data)
-        Mockito.`when`(repos.addToFavorite(data)).thenReturn(flowOf(expect))
+        `when`(repos.addToFavorite(data)).thenReturn(flowOf(expect))
 
-        val actual = repos.addToFavorite(data)
+        val actual = addFavoriteUseCase(data)
         actual.collect{
             assert(it is Resource.Error)
         }

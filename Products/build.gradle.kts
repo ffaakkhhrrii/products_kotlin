@@ -2,10 +2,12 @@
 buildscript {
     repositories {
         google()
+       // mavenCentral()
     }
     dependencies {
         val nav_version = "2.7.7"
         classpath("androidx.navigation:navigation-safe-args-gradle-plugin:$nav_version")
+       // classpath("org.jetbrains.kotlinx:kover-gradle-plugin:0.8.3")
     }
 }
 plugins {
@@ -17,4 +19,5 @@ plugins {
     id("com.google.dagger.hilt.android") version "2.48" apply false
 //    id ("org.jetbrains.kotlin.jvm") version "2.0.0" apply false
     id ("org.jetbrains.kotlin.plugin.serialization") version "2.0.0" apply false
+    //id("org.jetbrains.kotlinx.kover") version "0.8.3" apply false
 }

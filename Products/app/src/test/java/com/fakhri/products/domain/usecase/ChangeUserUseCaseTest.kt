@@ -50,7 +50,7 @@ class ChangeUserUseCaseTest{
         val expect = Resource.Success(user)
         `when`(repos.addUser(user)).thenReturn(flowOf(expect))
 
-        val actual = repos.addUser(user)
+        val actual = changeUserUseCase(user)
         actual.collect{
             assert(it is Resource.Success)
         }
@@ -68,7 +68,7 @@ class ChangeUserUseCaseTest{
         val expect = Resource.Error(exception.localizedMessage?: "Unknown Error",user)
         `when`(repos.addUser(user)).thenReturn(flowOf(expect))
 
-        val actual = repos.addUser(user)
+        val actual = changeUserUseCase(user)
         actual.collect{
             assert(it is Resource.Error)
         }

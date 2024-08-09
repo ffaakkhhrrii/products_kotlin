@@ -1,3 +1,5 @@
+import kotlinx.kover.gradle.plugin.dsl.KoverTestsExclusions
+
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.jetbrains.kotlin.android)
@@ -8,6 +10,7 @@ plugins {
     id("com.google.dagger.hilt.android")
     //id ("org.jetbrains.kotlin.jvm")
     id ("org.jetbrains.kotlin.plugin.serialization")
+    id("org.jetbrains.kotlinx.kover") version "0.8.3"
 }
 
 android {
@@ -115,7 +118,64 @@ dependencies {
     testImplementation ("androidx.paging:paging-common:3.1.1")
 }
 
+kover{
+    // filters for all report types of all build variants
+    reports{
+        filters {
+            excludes {
+                // excludes all classes and functions, annotated by specified annotations (with BINARY or RUNTIME AnnotationRetention), wildcards '*' and '?' are available
+                classes(
+                    "hilt_aggregated_deps.*",
+                    "dagger.*",
+                    "androidx.*",
+                    "com.fakhri.products.*.di.*",
+                    "com.fakhri.products.*.Hilt_*",
+                    "com.fakhri.products.Hilt_*",
+                    "com.fakhri.products.ProductApplication",
+                    "com.fakhri.products.*.*_Factory*",
+                    "com.fakhri.products.*.*Factory*",
+                    "com.fakhri.products.*.*_HiltModules*",
+                    "com.fakhri.products.*.*Module_*",
+                    "com.fakhri.products.*.*Module*",
+                    "com.fakhri.products.*.*MembersInjector*",
+                    "com.fakhri.products.*.*Impl*",
+                    "com.fakhri.products.BuildConfig*",
+                    "com.fakhri.products.*.Fake*",
+                    "com.fakhri.products.*.*Fragment*",
+                    "com.fakhri.products.*.*AppDatabase*",
+                    "com.fakhri.products.*.*Converter*",
+                    "com.fakhri.products.*.*Activity*",
+                    "com.fakhri.products.MainActivity",
+                    "com.fakhri.products.*.*UiAction*",
+                    "com.fakhri.products.*.*UiEffect*",
+                    "com.fakhri.products.*.*UiState*",
+                    "com.fakhri.products.*.*Action*",
+                    "com.fakhri.products.*.*Effect*",
+                    "com.fakhri.products.*.*State*",
+                    "com.fakhri.products.*.*Adapter*",
+                    "com.fakhri.products.*.*ViewHolder*",
+                    "com.fakhri.products.*.*Callback*",
+                    "com.fakhri.products.*.*Listener*",
+                    "com.fakhri.products.*.*Injection*",
+                    "com.fakhri.products.*.*Binding*",
+                    "com.fakhri.products.*.*Dialog*",
+                    "com.fakhri.products.*.component.*",
+                    "com.fakhri.products.*.view.*",
+                    "com.fakhri.products.helper.espresso.*",
+                    "com.fakhri.products.customview.*",
+                    "*.BR",
+                    "*.*Config*",
+                    "*.*DataBind*",
+                    "*.*Constants*",
+                    "*generated*",
+                    "com.fakhri.products.*.AppPreferences*",
+                )
+                annotatedBy("*Generated*")
+            }
+        }
+    }
+}
+
 kapt {
     correctErrorTypes = true
 }
-

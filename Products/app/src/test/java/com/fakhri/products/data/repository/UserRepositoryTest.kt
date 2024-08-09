@@ -8,8 +8,14 @@ import com.fakhri.products.data.network.response.user.Users
 import com.fakhri.products.data.network.response.user.toEntity
 import com.fakhri.products.data.network.user.UserRemoteDataSource
 import com.fakhri.products.data.utils.Resource
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.toList
 import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.test.StandardTestDispatcher
+import kotlinx.coroutines.test.resetMain
+import kotlinx.coroutines.test.runTest
+import kotlinx.coroutines.test.setMain
+import org.junit.After
 import org.junit.Assert.*
 import org.junit.Before
 import org.junit.Test
@@ -32,14 +38,21 @@ class UserRepositoryTest{
     private lateinit var repos: UserRepository
     private val localDataSource: UserLocalDataSource = mock(UserLocalDataSource::class.java)
     private val remoteDataSource: UserRemoteDataSource = mock(UserRemoteDataSource::class.java)
+    private val testDispatcher = StandardTestDispatcher()
 
     @Before
     fun setUp() {
+        Dispatchers.setMain(testDispatcher)
         repos = UserRepository(localDataSource, remoteDataSource)
     }
 
+    @After
+    fun tearDown(){
+        Dispatchers.resetMain()
+    }
+
     @Test
-    fun `addUser should return Loading then Success`() = runBlocking {
+    fun `addUser should return Loading then Success`() = runTest {
         val user = UsersEntity(
             id = 1,
             firstName = "Fakhri",
@@ -55,13 +68,14 @@ class UserRepositoryTest{
 
             val success = awaitItem()
             assert(success is Resource.Success)
+            cancelAndIgnoreRemainingEvents()
         }
 
         verify(localDataSource).addUser(user)
     }
 
     @Test
-    fun `addUser should return Loading then Error` () = runBlocking {
+    fun `addUser should return Loading then Error` () = runTest {
         val user = UsersEntity(
             id = 1,
             firstName = "Fakhri",
@@ -78,13 +92,14 @@ class UserRepositoryTest{
 
             val error = awaitItem()
             assert(error is Resource.Error)
+            cancelAndIgnoreRemainingEvents()
         }
 
         verify(localDataSource).addUser(user)
     }
 
     @Test
-    fun `resetUser should return Loading then Success` ()= runBlocking {
+    fun `resetUser should return Loading then Success` ()= runTest {
         val actual = repos.resetUser(1)
 
         actual.test {
@@ -93,6 +108,7 @@ class UserRepositoryTest{
 
             val success = awaitItem()
             assert(success is Resource.Success)
+            cancelAndIgnoreRemainingEvents()
         }
 
         verify(localDataSource).deleteUser(1)
@@ -110,12 +126,13 @@ class UserRepositoryTest{
 
             val error = awaitItem()
             assert(error is Resource.Error)
+            cancelAndIgnoreRemainingEvents()
         }
         verify(localDataSource).deleteUser(1)
     }
 
     @Test
-    fun `getUser should return Loading then Success`() = runBlocking {
+    fun `when getUser should return Loading then Success`() = runTest {
         val user = Users(
             id = 1,
             firstName = "Fakhri"
@@ -131,11 +148,12 @@ class UserRepositoryTest{
 
             val success = awaitItem()
             assert(success is Resource.Success)
+            cancelAndIgnoreRemainingEvents()
         }
     }
 
     @Test
-    fun `getUser should return Loading then Error`() = runBlocking {
+    fun `when getUser should return Loading then Error`() = runBlocking {
         val exception = Exception("Unknown Error")
         given(localDataSource.getUser(1)).willThrowUnchecked(exception)
         given(remoteDataSource.getUser(1)).willThrowUnchecked(exception)
@@ -147,11 +165,12 @@ class UserRepositoryTest{
 
             val error = awaitItem()
             assert(error is Resource.Error)
+            cancelAndIgnoreRemainingEvents()
         }
     }
 
     @Test
-    fun `getUserFromDB should return Loading then Success`() = runBlocking {
+    fun `when getUserFromDB should return Loading then Success`() = runTest {
         val user = Users(
             id = 1,
             firstName = "Fakhri"
@@ -159,28 +178,30 @@ class UserRepositoryTest{
 
         `when`(localDataSource.getUser(1)).thenReturn(user.toEntity())
 
-        val actual = repos.getUser(1)
+        val actual = repos.getUserFromDB(1)
         actual.test {
             val loading = awaitItem()
             assert(loading is Resource.Loading)
 
             val success = awaitItem()
             assert(success is Resource.Success)
+            cancelAndIgnoreRemainingEvents()
         }
     }
 
     @Test
-    fun `getUserFromDB should return Loading then Error`() = runBlocking {
+    fun `getUserFromDB should return Loading then Error`() = runTest {
         val exception = Exception("Unknown Error")
         given(localDataSource.getUser(1)).willThrowUnchecked(exception)
 
-        val actual = repos.getUser(1)
+        val actual = repos.getUserFromDB(1)
         actual.test {
             val loading = awaitItem()
             assert(loading is Resource.Loading)
 
             val error = awaitItem()
             assert(error is Resource.Error)
+            cancelAndIgnoreRemainingEvents()
         }
     }
 }

@@ -11,7 +11,6 @@ import com.fakhri.products.data.utils.Resource
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.first
-import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.test.StandardTestDispatcher
 import kotlinx.coroutines.test.resetMain
@@ -82,7 +81,7 @@ class ProductRepositoryTest {
     }
 
     @Test
-    fun `getProduct should return Loading then Success`() =
+    fun `when getProduct should return Loading then Success`() =
         runTest {
             val data = DetailProduct(
                 id = 1,
@@ -101,6 +100,7 @@ class ProductRepositoryTest {
 
                 val success = awaitItem()
                 assert(success is Resource.Success)
+                cancelAndIgnoreRemainingEvents()
             }
         }
 
@@ -116,6 +116,7 @@ class ProductRepositoryTest {
 
             val error = awaitItem()
             assert(error is Resource.Error)
+            cancelAndIgnoreRemainingEvents()
         }
     }
 
@@ -136,13 +137,14 @@ class ProductRepositoryTest {
 
             val success = awaitItem()
             assert(success is Resource.Success)
+            cancelAndIgnoreRemainingEvents()
         }
 
         verify(localDataSource).saveProduct(favoriteProductEntity)
     }
 
     @Test
-    fun `addToFavorite should Return Error`() = runTest {
+    fun `when addToFavorite should Return Error`() = runTest {
         val favoriteProductEntity = FavoriteProductEntity(
             id = 1,
             images = arrayListOf("https://example.com/image1.png"),
@@ -150,8 +152,7 @@ class ProductRepositoryTest {
             tags = arrayListOf("tag1", "tag2"),
             title = "Product 1"
         )
-        val exception = Exception("Database Error")
-
+        val exception = Exception("Error")
         //doThrow(exception).`when`(localDataSource).saveProduct(favoriteProductEntity)
         given(localDataSource.saveProduct(favoriteProductEntity)).willThrowUnchecked(exception)
 
@@ -162,12 +163,13 @@ class ProductRepositoryTest {
 
             val error = awaitItem()
             assert(error is Resource.Error)
+            cancelAndIgnoreRemainingEvents()
         }
         verify(localDataSource).saveProduct(favoriteProductEntity)
     }
 
     @Test
-    fun `unFavorite should Return Loading then Success`() = runBlocking {
+    fun `when unFavorite should Return Loading then Success`() = runTest {
         val product1 = FavoriteProductEntity(
             id = 1,
             images = arrayListOf("https://example.com/image1.png"),
@@ -183,13 +185,14 @@ class ProductRepositoryTest {
 
             val success = awaitItem()
             assert(success is Resource.Success)
+            cancelAndIgnoreRemainingEvents()
         }
         verify(localDataSource).deleteProduct(product1)
     }
 
 
     @Test
-    fun `unFavorite should Return Loading then Error`() = runTest {
+    fun `when unFavorite should Return Loading then Error`() = runTest {
         val favoriteProductEntity = FavoriteProductEntity(
             id = 1,
             images = arrayListOf("https://example.com/image1.png"),
@@ -209,6 +212,7 @@ class ProductRepositoryTest {
 
             val error = awaitItem()
             assert(error is Resource.Error)
+            cancelAndIgnoreRemainingEvents()
         }
         verify(localDataSource).deleteProduct(favoriteProductEntity)
     }
