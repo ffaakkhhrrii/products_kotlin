@@ -1,10 +1,8 @@
 package com.fakhri.products.ui.fragment.detail
 
-import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import app.cash.turbine.test
 import com.fakhri.products.data.local.db.product.FavoriteProductEntity
 import com.fakhri.products.data.network.response.detail.DetailProduct
-import com.fakhri.products.data.network.response.detail.toFavoriteProduct
 import com.fakhri.products.data.utils.Resource
 import com.fakhri.products.domain.usecase.AddFavoriteUseCase
 import com.fakhri.products.domain.usecase.DeleteFavoriteUseCase
@@ -12,22 +10,21 @@ import com.fakhri.products.domain.usecase.GetDetailProductUseCase
 import com.fakhri.products.domain.usecase.IsFavoriteUseCase
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.StandardTestDispatcher
-import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.resetMain
-import kotlinx.coroutines.test.setMain
+import kotlinx.coroutines.test.runCurrent
 import kotlinx.coroutines.test.runTest
+import kotlinx.coroutines.test.setMain
 import org.junit.After
-import org.junit.Assert.*
+import org.junit.Assert.assertEquals
+import org.junit.Assert.assertFalse
+import org.junit.Assert.assertTrue
 import org.junit.Before
-import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.mockito.Mock
-import org.mockito.Mockito.*
+import org.mockito.Mockito.`when`
 import org.mockito.MockitoAnnotations
 import org.mockito.junit.MockitoJUnitRunner
 
@@ -69,7 +66,7 @@ class DetailViewModelTest {
     }
 
     @Test
-    fun `fetchDetailProduct should update state product and isFavorite (true)`() = runTest {
+    fun `when fetchDetailProduct, should update state product and isFavorite (true)`() = runTest {
         val product = DetailProduct(
             id = 1,
             brand = "Kahf"
@@ -99,7 +96,7 @@ class DetailViewModelTest {
     }
 
     @Test
-    fun `onClickProduct should update state addFavorite and isFavorite (true)`() = runTest {
+    fun `when onClickProduct, should update state addFavorite and isFavorite (true)`() = runTest {
         val favoriteProductEntity = FavoriteProductEntity(
             id = 1,
             images = arrayListOf("https://example.com/image1.png"),
@@ -123,8 +120,9 @@ class DetailViewModelTest {
         }
     }
 
+    @OptIn(ExperimentalCoroutinesApi::class)
     @Test
-    fun `onClickProduct should update state deleteFavorite and isFavorite (false)`() = runTest {
+    fun `when onClickProduct, should update state deleteFavorite and isFavorite (false)`() = runTest {
         val favoriteProductEntity = FavoriteProductEntity(
             id = 1,
             images = arrayListOf("https://example.com/image1.png"),
@@ -150,7 +148,7 @@ class DetailViewModelTest {
     }
 
     @Test
-    fun `onClickProduct should trigger ShowMessageBar Effect`() = runTest {
+    fun `when onClickProduct should trigger ShowMessageBar Effect`() = runTest {
         val favoriteProductEntity = FavoriteProductEntity(
             id = 1,
             images = arrayListOf("https://example.com/image1.png"),
@@ -169,7 +167,7 @@ class DetailViewModelTest {
     }
 
     @Test
-    fun `BackButtonPressed should trigger BackButtonEffect`()= runTest {
+    fun `when BackButtonPressed should trigger BackButtonEffect`()= runTest {
         viewModel.effect.test {
             viewModel.processAction(DetailAction.BackButtonPressed)
 

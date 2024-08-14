@@ -45,6 +45,12 @@ class FavoriteViewModelTest{
     fun tearDown(){
         Dispatchers.resetMain()
     }
+    
+    @Test
+    fun `given state favorite list is Idle`() = runTest {
+        val actual = viewModel.state.value
+        assertEquals(FavoriteListDefaultState.Idle,actual)
+    }
 
     @Test
     fun `init paging favorite return not empty`()=  runTest {

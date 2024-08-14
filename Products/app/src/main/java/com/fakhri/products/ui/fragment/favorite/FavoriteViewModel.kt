@@ -25,13 +25,13 @@ import javax.inject.Inject
 @HiltViewModel
 class FavoriteViewModel @Inject constructor(
     private val getAllFavoriteUseCase: GetAllFavoriteUseCase
-): BaseViewModel<Nothing, FavoriteListUIAction, FavoriteListUIEffect>() {
+): BaseViewModel<FavoriteListDefaultState, FavoriteListUIAction, FavoriteListUIEffect>() {
 
     val loadingState = MutableStateFlow(false)
     private var _pagingDataFlow: Flow<PagingData<FavoriteProductEntity>>
     val pagingDataFlow: Flow<PagingData<FavoriteProductEntity>> get() = _pagingDataFlow
-    override val _state: MutableStateFlow<Nothing>
-        get() = TODO("Not yet implemented")
+
+    override val _state: MutableStateFlow<FavoriteListDefaultState> = MutableStateFlow(FavoriteListDefaultState.Idle)
 
     init {
         val favorites = actionStateFlow.filterIsInstance<FavoriteListUIAction.FetchFavoriteList>()
@@ -62,6 +62,10 @@ sealed class FavoriteListUIAction{
     object FetchFavoriteList: FavoriteListUIAction()
     data class OnClickProduct(val id: Int): FavoriteListUIAction()
     object BackButtonPress: FavoriteListUIAction()
+}
+
+sealed class FavoriteListDefaultState{
+    object Idle: FavoriteListDefaultState()
 }
 
 sealed class FavoriteListUIEffect{

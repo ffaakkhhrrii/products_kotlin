@@ -30,7 +30,6 @@ class DetailViewModel @Inject constructor(
 
     override val _state =  MutableStateFlow(DetailState())
     var _isFavorite = MutableStateFlow(false)
-    val isFavorite: StateFlow<Boolean> get() = _isFavorite
 
     private fun checkFavorite(id: Int): Boolean {
         viewModelScope.launch(Dispatchers.IO) {
@@ -53,7 +52,7 @@ class DetailViewModel @Inject constructor(
     }
 
     private fun onClickProduct(favoriteProductEntity: FavoriteProductEntity){
-        viewModelScope.launch {
+        viewModelScope.launch(Dispatchers.IO) {
             if (_isFavorite.value){
                 deleteFavoriteUseCase(favoriteProductEntity).collect{resource->
                     _isFavorite.value = false
@@ -93,7 +92,6 @@ class DetailViewModel @Inject constructor(
             checkFavorite(id)
         }
     }
-
 }
 
 data class DetailState(

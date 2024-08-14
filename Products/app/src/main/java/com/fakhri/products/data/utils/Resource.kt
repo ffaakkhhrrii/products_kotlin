@@ -1,7 +1,6 @@
 package com.fakhri.products.data.utils
 
 import kotlinx.coroutines.flow.Flow
-import retrofit2.Response
 
 sealed class Resource<T>(
     val data: T? = null,

@@ -22,14 +22,13 @@ import javax.inject.Inject
 @HiltViewModel
 class HomeViewModel @Inject constructor(
     private val getProductsUseCase: GetProductsUseCase
-) : BaseViewModel<Nothing, HomeAction,HomeEffect>() {
+) : BaseViewModel<HomeDefaultState, HomeAction,HomeEffect>() {
 
     val loadingState = MutableStateFlow(false)
     private var _pagingDataFlow: Flow<PagingData<Product>>
     val pagingDataFlow: Flow<PagingData<Product>> get() = _pagingDataFlow
 
-    override val _state: MutableStateFlow<Nothing>
-        get() = TODO("Not yet implemented")
+    override val _state : MutableStateFlow<HomeDefaultState> =  MutableStateFlow(HomeDefaultState.Idle)
 
     init {
         val products = actionStateFlow
@@ -65,6 +64,10 @@ sealed class HomeAction {
     object FetchProducts : HomeAction()
     data class OnClickProduct(val id: Int): HomeAction()
     object OnClickButtonFavorite: HomeAction()
+}
+
+sealed class HomeDefaultState{
+    object Idle: HomeDefaultState()
 }
 
 sealed class HomeEffect{

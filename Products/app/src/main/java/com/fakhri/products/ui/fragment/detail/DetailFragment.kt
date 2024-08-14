@@ -84,8 +84,9 @@ class DetailFragment : Fragment() {
             )
         }
 
+        val isFavoriteFlow = viewModel.state.map { it.isFavorite }
         viewLifecycleOwner.lifecycleScope.launch {
-            viewModel.isFavorite.collect {
+            isFavoriteFlow.collect{
                 if (it){
                     binding.btnFavorite.setImageResource(R.drawable.ic_filled_favorite)
                 }else{

@@ -3,6 +3,7 @@ package com.fakhri.products.data.network.user
 import com.fakhri.products.data.network.api.ProductService
 import com.fakhri.products.data.network.response.user.Users
 import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.test.runTest
 import kotlinx.serialization.json.Json
 import org.junit.Assert.*
 import org.junit.Before
@@ -23,7 +24,7 @@ class UserRemoteDataSourceImplTest {
     }
 
     @Test
-    fun `getUser remote datasource must be the same as result response api`() = runBlocking{
+    fun `when getUser remote datasource must be the same as result response api`() = runTest{
         val expectedUser = readJsonFile<Users>("user.json")
         `when`(apiService.getUsersId(2)).thenReturn(Response.success(expectedUser))
 

@@ -11,7 +11,6 @@ import com.fakhri.products.data.utils.Resource
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.first
-import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.test.StandardTestDispatcher
 import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.runTest
@@ -59,13 +58,13 @@ class ProductRepositoryTest {
     }
 
     @Test
-    fun `getData should return not null`() = runTest {
+    fun `when getData should return not null`() = runTest {
         val result = repos.getData().first()
         assertNotNull(result)
     }
 
     @Test
-    fun `getAllFavorite should return not null`() = runTest(testDispatcher) {
+    fun `when getAllFavorite should return not null`() = runTest(testDispatcher) {
         val product1 = FavoriteProductEntity(
             id = 1,
             images = arrayListOf("https://example.com/image1.png"),
@@ -105,7 +104,7 @@ class ProductRepositoryTest {
         }
 
     @Test
-    fun `getProduct should return Loading then Error`() = runTest {
+    fun `given getProduct should return Loading then Error`() = runTest {
         val exception = Exception("Unknown Error")
 
         given(remoteDataSource.getProduct(1)).willThrowUnchecked(exception)
@@ -121,7 +120,7 @@ class ProductRepositoryTest {
     }
 
     @Test
-    fun `addToFavorite should return Loading then Success`() = runTest {
+    fun `when addToFavorite should return Loading then Success`() = runTest {
         val favoriteProductEntity = FavoriteProductEntity(
             id = 1,
             images = arrayListOf("https://example.com/image1.png"),
@@ -192,7 +191,7 @@ class ProductRepositoryTest {
 
 
     @Test
-    fun `when unFavorite should Return Loading then Error`() = runTest {
+    fun `given unFavorite should Return Loading then Error`() = runTest {
         val favoriteProductEntity = FavoriteProductEntity(
             id = 1,
             images = arrayListOf("https://example.com/image1.png"),
@@ -218,7 +217,7 @@ class ProductRepositoryTest {
     }
 
     @Test
-    fun `isFavorite should return false`(): Unit = runBlocking {
+    fun `when isFavorite should return false`(): Unit = runTest {
 
         `when`(localDataSource.getProduct(1)).thenReturn(null)
 
@@ -228,7 +227,7 @@ class ProductRepositoryTest {
     }
 
     @Test
-    fun `isFavorite should return true`() = runBlocking {
+    fun `when isFavorite should return true`() = runTest {
         val favoriteProductEntity = FavoriteProductEntity(
             id = 1,
             images = arrayListOf("https://example.com/image1.png"),
