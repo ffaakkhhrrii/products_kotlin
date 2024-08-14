@@ -52,6 +52,12 @@ class HomeViewModelTest{
     }
 
     @Test
+    fun `given state homefragment is Idle` () = runTest {
+        val actual = viewModel.state.value
+        assertEquals(HomeDefaultState.Idle,actual)
+    }
+
+    @Test
     fun`when init paging products return not empty`() = runTest {
         val product1 = Product(
             1,

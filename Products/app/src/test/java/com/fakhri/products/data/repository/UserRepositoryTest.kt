@@ -9,8 +9,6 @@ import com.fakhri.products.data.network.response.user.toEntity
 import com.fakhri.products.data.network.user.UserRemoteDataSource
 import com.fakhri.products.data.utils.Resource
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.flow.toList
-import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.test.StandardTestDispatcher
 import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.runTest
@@ -52,7 +50,7 @@ class UserRepositoryTest{
     }
 
     @Test
-    fun `addUser should return Loading then Success`() = runTest {
+    fun `when addUser should return Loading then Success`() = runTest {
         val user = UsersEntity(
             id = 1,
             firstName = "Fakhri",
@@ -75,7 +73,7 @@ class UserRepositoryTest{
     }
 
     @Test
-    fun `addUser should return Loading then Error` () = runTest {
+    fun `when addUser should return Loading then Error` () = runTest {
         val user = UsersEntity(
             id = 1,
             firstName = "Fakhri",
@@ -99,7 +97,7 @@ class UserRepositoryTest{
     }
 
     @Test
-    fun `resetUser should return Loading then Success` ()= runTest {
+    fun `when resetUser should return Loading then Success` ()= runTest {
         val actual = repos.resetUser(1)
 
         actual.test {
@@ -115,7 +113,7 @@ class UserRepositoryTest{
     }
 
     @Test
-    fun `resetUser should return Loading then Error`()= runBlocking {
+    fun `given resetUser should return Loading then Error`()= runTest {
         val exception = Exception("Unknown Error")
         given(localDataSource.deleteUser(1)).willThrowUnchecked(exception)
         val actual = repos.resetUser(1)
@@ -153,7 +151,7 @@ class UserRepositoryTest{
     }
 
     @Test
-    fun `when getUser should return Loading then Error`() = runBlocking {
+    fun `given getUser should return Loading then Error`() = runTest {
         val exception = Exception("Unknown Error")
         given(localDataSource.getUser(1)).willThrowUnchecked(exception)
         given(remoteDataSource.getUser(1)).willThrowUnchecked(exception)
@@ -167,6 +165,30 @@ class UserRepositoryTest{
             assert(error is Resource.Error)
             cancelAndIgnoreRemainingEvents()
         }
+    }
+
+    @Test
+    fun `getUser should fetch from API and save to local data source if user is not found locally`() = runTest {
+        val userId = 1
+        val apiUser = Users(id = userId)
+        val expectedUser = apiUser.toEntity()
+
+        // Mock local data source to return null
+        `when`(localDataSource.getUser(userId)).thenReturn(null)
+
+        // Mock remote data source to return the API user
+        `when`(remoteDataSource.getUser(userId)).thenReturn(Response.success(apiUser))
+
+        // Execute the function and verify the flow emissions
+        repos.getUser(userId).test {
+            assert(awaitItem() is Resource.Loading)
+            assert(awaitItem() is Resource.Success)
+            awaitComplete()
+        }
+
+        // Verify that the API was called and the user was saved to the local data source
+        verify(remoteDataSource).getUser(userId)
+        verify(localDataSource).addUser(expectedUser)
     }
 
     @Test
@@ -190,7 +212,7 @@ class UserRepositoryTest{
     }
 
     @Test
-    fun `getUserFromDB should return Loading then Error`() = runTest {
+    fun `given getUserFromDB should return Loading then Error`() = runTest {
         val exception = Exception("Unknown Error")
         given(localDataSource.getUser(1)).willThrowUnchecked(exception)
 

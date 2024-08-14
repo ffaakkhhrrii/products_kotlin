@@ -2,9 +2,13 @@ package com.fakhri.camerax
 
 import android.Manifest
 import android.annotation.SuppressLint
+import android.content.ContentValues
+import android.content.Context
 import android.content.pm.PackageManager
 import android.net.Uri
+import android.os.Build
 import android.os.Bundle
+import android.provider.MediaStore
 import android.util.Log
 import android.view.View
 import android.widget.ImageButton
@@ -29,6 +33,7 @@ import androidx.core.content.ContextCompat
 import com.fakhri.camerax.databinding.ActivityMainBinding
 import java.io.File
 import java.text.SimpleDateFormat
+import java.util.Date
 import java.util.Locale
 
 class MainActivity : AppCompatActivity() {
@@ -44,6 +49,10 @@ class MainActivity : AppCompatActivity() {
     private var isRecording = false
     private var mode = "photo"
     private var recording: Recording? = null
+    private val FILENAME_FORMAT = "yyyyMMdd_HHmmss"
+    private val timeStamp: String = SimpleDateFormat(FILENAME_FORMAT, Locale.getDefault()).format(
+        Date()
+    )
 
     companion object {
         private const val TAG = "CameraXApp"
@@ -114,7 +123,6 @@ class MainActivity : AppCompatActivity() {
                 binding.flashBtn.setImageResource(R.drawable.flash_off)
                 ImageCapture.FLASH_MODE_OFF
             }
-
             startCamera()
         }
 
@@ -135,7 +143,7 @@ class MainActivity : AppCompatActivity() {
             outputOptions, ContextCompat.getMainExecutor(this),
             object : ImageCapture.OnImageSavedCallback {
                 override fun onImageSaved(outputFileResults: ImageCapture.OutputFileResults) {
-                    val savedUri = Uri.fromFile(photoFile)
+                    val savedUri = saveToGaleryImage(this@MainActivity,photoFile)
                     val msg = "Photo capture succeed : $savedUri"
                     Toast.makeText(this@MainActivity, msg, Toast.LENGTH_SHORT).show()
                     Log.d(TAG, msg)
@@ -209,6 +217,7 @@ class MainActivity : AppCompatActivity() {
                         if (!recordEvent.hasError()){
                             val savedUri = Uri.fromFile(videoFile)
                             val msg = "Video record success : $savedUri"
+                            saveToGaleryVideo(this@MainActivity,videoFile)
                             Toast.makeText(this@MainActivity,msg,Toast.LENGTH_SHORT).show()
                             Log.d(TAG,msg)
                         }else{
@@ -251,6 +260,54 @@ class MainActivity : AppCompatActivity() {
         }
         return if (mediaDir != null && mediaDir.exists())
             mediaDir else filesDir
+    }
+
+    fun saveToGaleryImage(context: Context,file: File): Uri {
+        var uri: Uri? = null
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+            val contentValues = ContentValues().apply {
+                put(MediaStore.MediaColumns.DISPLAY_NAME, "$timeStamp.jpg")
+                put(MediaStore.MediaColumns.MIME_TYPE, "image/jpeg")
+                put(MediaStore.MediaColumns.RELATIVE_PATH, "Pictures/MyCamera/")
+            }
+            uri = context.contentResolver.insert(
+                MediaStore.Images.Media.EXTERNAL_CONTENT_URI,
+                contentValues
+            )?.also { uri ->
+                contentResolver.openOutputStream(uri).use { outputStream ->
+                    file.inputStream().use { inputStream ->
+                        inputStream.copyTo(outputStream!!)
+                    }
+                }
+            }
+            // content://media/external/images/media/1000000062
+            // storage/emulated/0/Pictures/MyCamera/20230825_155303.jpg
+        }
+        return uri!!
+    }
+
+    fun saveToGaleryVideo(context: Context,file: File): Uri {
+        var uri: Uri? = null
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+            val contentValues = ContentValues().apply {
+                put(MediaStore.MediaColumns.DISPLAY_NAME, "$timeStamp.mp4")
+                put(MediaStore.MediaColumns.MIME_TYPE, "video/mp4")
+                put(MediaStore.MediaColumns.RELATIVE_PATH, "Pictures/MyCamera/")
+            }
+            uri = context.contentResolver.insert(
+                MediaStore.Video.Media.EXTERNAL_CONTENT_URI,
+                contentValues
+            )?.also { uri ->
+                contentResolver.openOutputStream(uri).use { outputStream ->
+                    file.inputStream().use { inputStream ->
+                        inputStream.copyTo(outputStream!!)
+                    }
+                }
+            }
+            // content://media/external/images/media/1000000062
+            // storage/emulated/0/Pictures/MyCamera/20230825_155303.jpg
+        }
+        return uri!!
     }
 
 }
